@@ -5,7 +5,7 @@
 
 ## OC对象内部是如何布局的
 - OC对象编译成C++代码
-   ```
+   ```php
    struct NSObject_IMPL {
     Class isa;
   };
