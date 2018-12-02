@@ -21,7 +21,7 @@
       char 指针 连续操作1个字节空间 <br>
   
 ## OC自定义对象IMP实现及内存大小
-  ```php
+  ```c
   @interface Student : NSObject
   {
     @public
@@ -164,7 +164,8 @@
     > 我们在runtime的源码中搜索objc_class，然后在obj-runtime-new.h这找到了class的结构<br>
     class_ro_t:代表只读；class_rw_t:readWrite
     
-    ```php
+ ```php
+    
     struct objc_class : objc_object {
       // Class ISA;
       Class superclass;
@@ -175,9 +176,6 @@
       }
       
     };
-    ```
-    
-    ```php
     struct class_rw_t {
       // Be warned that Symbolication knows the layout of this structure.
       const class_ro_t *ro;
@@ -185,10 +183,7 @@
       property_array_t properties; //属性列表
       protocol_array_t protocols;   //协议列表
       
-    }; 
-    ```
-    
-    ```php
+    };     
     struct class_ro_t {
       const char * name;   //类名
       method_list_t * baseMethodList;
@@ -204,7 +199,7 @@
       
     };
     
-    ```
+ ```
     
 
  
