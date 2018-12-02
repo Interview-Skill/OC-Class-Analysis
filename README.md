@@ -49,6 +49,20 @@
 ***
 
 ## 窥探内存结构
-### 方式一：通过打断点。
+##### 方式一：通过打断点。
 - Debug Workflow -> viewMemory address中输入stu的地址
- 
+![debug-one](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/memroy1.png)
+##### 方式二：通过lldb指令xcode自带的调试器
+  ```php
+    memory read 0x10074c450
+    // 简写  x 0x10074c450
+
+    // 增加读取条件
+    // memory read/数量格式字节数  内存地址
+    // 简写 x/数量格式字节数  内存地址
+    // 格式 x是16进制，f是浮点，d是10进制
+    // 字节大小   b：byte 1字节，h：half word 2字节，w：word 4字节，g：giant word 8字节
+
+    示例：x/4xw    //   /后面表示如何读取数据 w表示4个字节4个字节读取，x表示以16进制的方式读取数据，4则表示读取4次
+  ```
+![debug-one](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/1434508-0f4104937adf7401.png)
