@@ -15,6 +15,8 @@
 		48CDA70D21B2C18400B32374 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA70C21B2C18400B32374 /* main.m */; };
 		48CDA71721B2C18400B32374 /* iOS______UITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA71621B2C18400B32374 /* iOS______UITests.m */; };
 		48CDA72721B3648D00B32374 /* Student.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA72621B3648D00B32374 /* Student.m */; };
+		48CDA72C21B4190300B32374 /* PersonOne.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA72B21B4190300B32374 /* PersonOne.m */; };
+		48CDA72F21B41D6A00B32374 /* StuentOne.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA72E21B41D6A00B32374 /* StuentOne.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +48,10 @@
 		48CDA72521B3648D00B32374 /* Student.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Student.h; sourceTree = "<group>"; };
 		48CDA72621B3648D00B32374 /* Student.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Student.m; sourceTree = "<group>"; };
 		48CDA72821B369C700B32374 /* Student.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Student.cpp; sourceTree = "<group>"; };
+		48CDA72A21B4190300B32374 /* PersonOne.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersonOne.h; sourceTree = "<group>"; };
+		48CDA72B21B4190300B32374 /* PersonOne.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersonOne.m; sourceTree = "<group>"; };
+		48CDA72D21B41D6A00B32374 /* StuentOne.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StuentOne.h; sourceTree = "<group>"; };
+		48CDA72E21B41D6A00B32374 /* StuentOne.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StuentOne.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +93,7 @@
 		48CDA6FC21B2C18300B32374 /* iOS底层原理总结 */ = {
 			isa = PBXGroup;
 			children = (
+				48CDA72921B418E900B32374 /* OC结构 */,
 				48CDA6FD21B2C18300B32374 /* AppDelegate.h */,
 				48CDA6FE21B2C18300B32374 /* AppDelegate.m */,
 				48CDA70021B2C18300B32374 /* ViewController.h */,
@@ -112,6 +119,17 @@
 				48CDA71821B2C18400B32374 /* Info.plist */,
 			);
 			path = "iOS底层原理总结UITests";
+			sourceTree = "<group>";
+		};
+		48CDA72921B418E900B32374 /* OC结构 */ = {
+			isa = PBXGroup;
+			children = (
+				48CDA72A21B4190300B32374 /* PersonOne.h */,
+				48CDA72B21B4190300B32374 /* PersonOne.m */,
+				48CDA72D21B41D6A00B32374 /* StuentOne.h */,
+				48CDA72E21B41D6A00B32374 /* StuentOne.m */,
+			);
+			path = "OC结构";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,8 +232,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				48CDA72C21B4190300B32374 /* PersonOne.m in Sources */,
 				48CDA70221B2C18300B32374 /* ViewController.m in Sources */,
 				48CDA70D21B2C18400B32374 /* main.m in Sources */,
+				48CDA72F21B41D6A00B32374 /* StuentOne.m in Sources */,
 				48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */,
 				48CDA72721B3648D00B32374 /* Student.m in Sources */,
 			);
