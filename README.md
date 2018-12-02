@@ -44,7 +44,7 @@
   ```
 - Student自定义对象占用的内存空间是ISA(8) + _no(4) + _age(4) + address（8） + _name（8） = 32
 
-## 总结：一个NSObjec对象所占用的内存是8个字节
+#### 总结：一个NSObjec对象所占用的内存是8个字节
 
 ***
 
@@ -66,3 +66,85 @@
     示例：x/4xw    //   /后面表示如何读取数据 w表示4个字节4个字节读取，x表示以16进制的方式读取数据，4则表示读取4次
   ```
 ![debug-one](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/1434508-0f4104937adf7401.png)
+
+> 我们可以总结内存对齐为两个原则：<br>
+原则 1. 前面的地址必须是后面的地址正数倍,不是就补齐。<br>
+原则 2. 整个Struct的地址必须是最大字节的整数倍。<br>
+
+## OC对象的分类
+> OC的类信息存放在哪里? <br>
+对象的isa指针指向哪里?
+示例代码：
+```php
+    #import <Foundation/Foundation.h>
+    #import <objc/runtime.h>
+
+    /* Person */ 
+    @interface Person : NSObject <NSCopying>
+    {
+        @public
+        int _age;
+    }
+    @property (nonatomic, assign) int height;
+    - (void)personMethod;
+    + (void)personClassMethod;
+    @end
+
+    @implementation Person
+    - (void)personMethod {}
+    + (void)personClassMethod {}
+    @end
+
+    /* Student */
+    @interface Student : Person <NSCoding>
+    {
+        @public
+        int _no;
+    }
+    @property (nonatomic, assign) int score;
+    - (void)studentMethod;
+    + (void)studentClassMethod;
+    @end
+
+    @implementation Student
+    - (void)studentMethod {}
+    + (void)studentClassMethod {}
+    @end
+
+    int main(int argc, const char * argv[]) {
+        @autoreleasepool {      
+            NSObject *object1 = [[NSObject alloc] init];
+            NSObject *object2 = [[NSObject alloc] init];
+
+            Student *stu = [[Student alloc] init];
+            [Student load];
+
+            Person *p1 = [[Person alloc] init];
+            p1->_age = 10;
+            [p1 personMethod];
+            [Person personClassMethod];
+            Person *p2 = [[Person alloc] init];
+            p2->_age = 20;
+        }
+        return 0;
+    }
+    ```
+ #### OC的对象类型：
+  - instance 对象（实力对象），如：Person *person
+  - class对象（类对象），
+  - meta-class对象（元类对象）；
+  
+  ```php
+    PersonOne *person = [[PersonOne alloc] init];//person 是一个instance变量
+    //可以使用class方法或者runtime获取
+    Class class = [person class]; //class是类对象
+    Class class1 = object_getClass(person);//通过runtime获取类对象
+    //class或者runtime中传入的参数如果是类对象的话，就会获取元类对象
+    Class meta_class = [NSObject class];//获取元类对象
+    Class meta_class1 = object_getClass([PersonOne class]);//元类
+    if (class_isMetaClass(meta_class1)) {
+      NSLog(@"is meta-class");
+    }
+  ```
+
+
