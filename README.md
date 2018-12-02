@@ -152,6 +152,7 @@
   ```php
     NSObjcet *object1 = [[NSObjcet alloc] init];
     NSObjcet *object2 = [[NSObjcet alloc] init];
+    0x600001d210a0 0x600001d21010
   ```
   > 不同的instance对象内存地址是不同的
   2. 每一个类在内存中有且只有一个class对象。
@@ -228,6 +229,8 @@
   ![meta-class](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/meta-class.png)
   > meta-class对象和class对象的内存结构是一样的，所以meta-class中也有类的属性信息，类的对象方法信息等成员变量，但是其中的值可能是空的。
  
+#### 调用instance方法/class方式runtime是如何找到方法实现的？
+
 #### Question:
   1. 实例对象的方法的代码放在什么地方呢？
   2. 类的方法的信息，协议的信息，属性的信息都存放在什么地方呢？
