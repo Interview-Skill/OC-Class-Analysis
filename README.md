@@ -149,6 +149,11 @@
   ```
 #### instance对象不唯一性；class对象和meta-class唯一性
   1. instance对象就是通过类alloc出来的对象，每次调用alloc都会产生新的instance对象；
+  ```php
+    NSObjcet *object1 = [[NSObjcet alloc] init];
+    NSObjcet *object2 = [[NSObjcet alloc] init];
+  ```
+  > 不同
   2. 每一个类在内存中有且只有一个class对象。
   3. 每个类在内存中有且只有一个meta-class对象。
  
@@ -156,6 +161,8 @@
   1. instance对象在内存中存储的信息包括
     - isa指针
     - 其成员变量
+  ![instance-message](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/instance.png)
+  
   2. class对象在内存中存放的信息包括：
     - isa指针
     - superclass指针
@@ -163,45 +170,47 @@
     - 类的对象方法信息（instance method），类的协议信息（protocol）
     > 我们在runtime的源码中搜索objc_class，然后在obj-runtime-new.h这找到了class的结构<br>
     class_ro_t:代表只读；class_rw_t:readWrite
-    
+  ![class-message](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/class.png)
  ```php
-    
-    struct objc_class : objc_object {
-      // Class ISA;
-      Class superclass;
-      cache_t cache;             // 方法缓存
-      class_data_bits_t bits;    // 用于获取类的具体信息
-      class_rw_t *data() { 
-          return bits.data();
-      }
-      
-    };
-    struct class_rw_t {
-      // Be warned that Symbolication knows the layout of this structure.
-      const class_ro_t *ro;
-      method_array_t methods;    //方法列表
-      property_array_t properties; //属性列表
-      protocol_array_t protocols;   //协议列表
-      
-    };     
-    struct class_ro_t {
-      const char * name;   //类名
-      method_list_t * baseMethodList;
-      protocol_list_t * baseProtocols;
-      const ivar_list_t * ivars;    //成员变量列表
+  struct objc_class : objc_object {
+    // Class ISA;
+    Class superclass;
+    cache_t cache;             // 方法缓存
+    class_data_bits_t bits;    // 用于获取类的具体信息
+    class_rw_t *data() { 
+        return bits.data();
+    }
 
-      const uint8_t * weakIvarLayout;
-      property_list_t *baseProperties;
+  };
+  struct class_rw_t {
+    // Be warned that Symbolication knows the layout of this structure.
+    const class_ro_t *ro;
+    method_array_t methods;    //方法列表
+    property_array_t properties; //属性列表
+    protocol_array_t protocols;   //协议列表
 
-      method_list_t *baseMethods() const {
-          return baseMethodList;
-      }
-      
-    };
-    
+  };     
+  struct class_ro_t {
+    const char * name;   //类名
+    method_list_t * baseMethodList;
+    protocol_list_t * baseProtocols;
+    const ivar_list_t * ivars;    //成员变量列表
+
+    const uint8_t * weakIvarLayout;
+    property_list_t *baseProperties;
+
+    method_list_t *baseMethods() const {
+        return baseMethodList;
+    }
+
+  };
  ```
-    
-
+ 3. meta-class对象在内存中存放的信息包括：
+  - isa指针
+  - superclass指针
+  - 类的类方法的信息（class method）
+  ![meta-class](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/meta-class.png)
+  > meta-class对象和class对象的内存结构是一样的，所以meta-class中也有类的属性信息，类的对象方法信息等成员变量，但是其中的值可能是空的。
  
 #### Question:
   1. 实例对象的方法的代码放在什么地方呢？
