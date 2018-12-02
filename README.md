@@ -153,9 +153,25 @@
     NSObjcet *object1 = [[NSObjcet alloc] init];
     NSObjcet *object2 = [[NSObjcet alloc] init];
   ```
-  > 不同
+  > 不同的instance对象内存地址是不同的
   2. 每一个类在内存中有且只有一个class对象。
+  ```php
+    Class objectClass1 = [object1 class];
+    Class objectClass2 = [object2 class];
+    Class objectClass3 = [NSObject class];
+    // runtime
+    Class objectClass4 = object_getClass(object1);
+    Class objectClass5 = object_getClass(object2);
+    NSLog(@"%p %p %p %p %p", objectClass1, objectClass2, objectClass3, objectClass4, objectClass5);
+    0x10f990f38 0x10f990f38 0x10f990f38 0x10f990f38 0x10f990f38
+  ```
   3. 每个类在内存中有且只有一个meta-class对象。
+  ```php
+    Class metaObjectClass1 = object_getClass([NSObject class]);
+    Class metaObjectClass2 = [NSObject class];
+    NSLog(@"%p %p", metaObjectClass1, metaObjectClass2);
+    0x10e050ee8 0x10e050f38
+  ```
  
 #### instance/class/meta-class对象存放的信息
   1. instance对象在内存中存储的信息包括
