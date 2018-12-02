@@ -173,18 +173,22 @@
       class_rw_t *data() { 
           return bits.data();
       }
-      ...
+      
     };
+    ```
+    
+    ```php
     struct class_rw_t {
       // Be warned that Symbolication knows the layout of this structure.
       const class_ro_t *ro;
       method_array_t methods;    //方法列表
       property_array_t properties; //属性列表
       protocol_array_t protocols;   //协议列表
-      ...
-    };
-      char *demangledName;
+      
+    }; 
+    ```
     
+    ```php
     struct class_ro_t {
       const char * name;   //类名
       method_list_t * baseMethodList;
@@ -197,8 +201,9 @@
       method_list_t *baseMethods() const {
           return baseMethodList;
       }
-      ...
+      
     };
+    
     ```
     
 
