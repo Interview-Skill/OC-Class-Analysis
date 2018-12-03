@@ -231,6 +231,45 @@
  
 #### 调用instance方法/class方式runtime是如何找到方法实现的？
 
+- instance对象调用对象方法：
+ ```php
+ [stu studentMethod];
+ ```
+ > instance的isa指向class，当调用对象方法时，通过instance的isa找到class，最后找到对象方法的实现进行调用。
+ 
+- 当类对象调用类方法的时候：
+```php
+ [Student studentMethod];
+ ```
+ > class的isa指向meta-class;当调用类方法时，通过class的isa找到meta-class，最后找到类方法的实现进行调用
+ 
+ - 当对象调用其父类对象方法的时候:要使用到class类对象superclass指针
+ ```php
+[stu personMethod];
+[stu init];
+```
+> 当Student的instance对象要调用Person的对象方法时，会先通过isa找到Student的class，然后通过superclass找到Person的class，最后找到对象方法的实现进行调用，同样如果Person发现自己没有响应的对象方法，又会通过Person的superclass指针找到NSObject的class对象，去寻找响应的方法
+
+- 当类对象调用父类的类方法时:
+```php
+[Student personClassMethod];
+[Student load];
+```
+> 当Student的class要调用Person的类方法时，会先通过isa找到Student的meta-class，然后通过superclass找到Person的meta-class，最后找到类方法的实现进行调用
+
+###对isa、superclass总结
+
+> instance的isa指向class <br>
+> class的isa指向meta-class<br>
+> meta-class的isa指向基类的meta-class，基类的isa指向自己<br>
+> class的superclass指向父类的class，如果没有父类，superclass指针为nil<br>
+> meta-class的superclass指向父类的meta-class，基类的meta-class的superclass指向基类的class<br>
+> instance调用对象方法的轨迹，isa找到class，方法不存在，就通过superclass找父类<br>
+> class调用类方法的轨迹，isa找meta-class，方法不存在，就通过superclass找父类<br>
+
+
+
+
 #### Question:
   1. 实例对象的方法的代码放在什么地方呢？
   2. 类的方法的信息，协议的信息，属性的信息都存放在什么地方呢？
