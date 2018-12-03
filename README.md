@@ -257,15 +257,15 @@
 ```
 > 当Student的class要调用Person的类方法时，会先通过isa找到Student的meta-class，然后通过superclass找到Person的meta-class，最后找到类方法的实现进行调用
 
-###对isa、superclass总结
+### 对isa、superclass总结
 
-> instance的isa指向class <br>
-> class的isa指向meta-class<br>
-> meta-class的isa指向基类的meta-class，基类的isa指向自己<br>
-> class的superclass指向父类的class，如果没有父类，superclass指针为nil<br>
-> meta-class的superclass指向父类的meta-class，基类的meta-class的superclass指向基类的class<br>
-> instance调用对象方法的轨迹，isa找到class，方法不存在，就通过superclass找父类<br>
-> class调用类方法的轨迹，isa找meta-class，方法不存在，就通过superclass找父类<br>
+> 1.instance的isa指向class <br>
+> 2.class的isa指向meta-class<br>
+> 3.meta-class的isa指向基类的meta-class，基类的isa指向自己<br>
+> 4.class的superclass指向父类的class，如果没有父类，superclass指针为nil<br>
+> 5.meta-class的superclass指向父类的meta-class，基类的meta-class的superclass指向基类的class<br>
+> 6.instance调用对象方法的轨迹，isa找到class，方法不存在，就通过superclass找父类<br>
+> 7.class调用类方法的轨迹，isa找meta-class，方法不存在，就通过superclass找父类<br>
 
 
 
