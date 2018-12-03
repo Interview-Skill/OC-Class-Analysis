@@ -236,12 +236,14 @@
  [stu studentMethod];
  ```
  > instance的isa指向class，当调用对象方法时，通过instance的isa找到class，最后找到对象方法的实现进行调用。
+ ![instance-isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa.png)
  
 - 当类对象调用类方法的时候：
 ```php
  [Student studentMethod];
  ```
  > class的isa指向meta-class;当调用类方法时，通过class的isa找到meta-class，最后找到类方法的实现进行调用
+ ![meta-isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/meta-isa.png)
  
  - 当对象调用其父类对象方法的时候:要使用到class类对象superclass指针
  ```php
@@ -267,12 +269,10 @@
 > 6.instance调用对象方法的轨迹，isa找到class，方法不存在，就通过superclass找父类<br>
 > 7.class调用类方法的轨迹，isa找meta-class，方法不存在，就通过superclass找父类<br>
 
-
-
+![classic](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/classic.png)
 
 #### Question:
   1. 实例对象的方法的代码放在什么地方呢？
   2. 类的方法的信息，协议的信息，属性的信息都存放在什么地方呢？
-  3. 
  
 
