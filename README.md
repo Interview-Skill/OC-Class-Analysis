@@ -274,5 +274,18 @@
 #### Question:
   1. 实例对象的方法的代码放在什么地方呢？
   2. 类的方法的信息，协议的信息，属性的信息都存放在什么地方呢？
- 
+  看到这里你应该知道了吧！
+  
+#### 探索instance->isa 和 class内存地址是否一致
+
+```php
+NSObject *object = [[NSObject alloc] init];
+Class objectClass = [NSObject class];
+Class objectMetaClass = object_getClass([NSObject class]);
+NSLog(@"%p %p %p", object, objectClass, objectMetaClass);
+
+```
+object-isa指针地址0x001dffff96537141经过同0x00007ffffffffff8位运算，得出objectClass的地址0x00007fff96537140
+
+
 
