@@ -30,6 +30,25 @@ iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）<b
 应该一致：
 但是😲😲😲😲：
 ![kvo-isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-isa.png)
-从上图的打印我们可以发现添加KVO之后，kvoPerson1的isa指向了一个新的类对象NSKVONotifying_KVOPerson
-下面分析setAge方法在添加kvo和没有添加时的左右：
+从上图的打印我们可以发现添加KVO之后，kvoPerson1的isa指向了一个新的类对象NSKVONotifying_KVOPerson,这个类继承自KVOPerson类；所以当你使用kvoPerson1实例对象调用setAge方法时，会先根据isa指针找到新的类对象NSKVONotifying_KVOPerson,并且**重写了这个类的setAge方法**
+![not-use-kvo](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-setage-before.png)
+添加KVO之后isa指针的指向：
+![use-kvo](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-setage.png)
+
+> NSKVONotifyin_Person中的setage方法中其实调用了 Fundation框架中C语言函数 _NSsetIntValueAndNotify，_NSsetIntValueAndNotify内部做的操作相当于，首先调用willChangeValueForKey 将要改变方法，之后调用父类的setage方法对成员变量赋值，最后调用didChangeValueForKey已经改变方法。didChangeValueForKey中会调用监听器的监听方法，最终来到监听者的observeValueForKeyPath方法中。
+
+### 验证KVO底层实现
+
+1.通过打印方法实现的地址来看一下kvoPerson1和kvoPerson2的setage的方法实现的地址在添加KVO前后有什么变化。
+```php
+// 通过methodForSelector找到方法实现的地址
+NSLog(@"添加KVO监听之前 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
+	
+NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld;
+[kvoPerson1 addObserver:self forKeyPath:@"age" options:NSKeyValueObservingOptionNew context:nil];
+
+NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
+```
+![set-age-method]()
+
 
