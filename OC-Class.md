@@ -10,6 +10,16 @@
 #pragma clang diagnostic pop
 }
 ```
+Xcode对一个对象编译后为C++代码：
+```php
+struct Student_IMPL {
+	struct NSObject_IMPL NSObject_IVARS;
+	int _no;
+	int _age;
+	NSString *address;
+	NSString * _Nonnull _name;
+};
+```
 
 可以看到NSObject有个属性指向他们的类Class：下面来看下Class的结构：
 ```php
