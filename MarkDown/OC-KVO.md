@@ -29,3 +29,7 @@ iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）<b
 通过对上面的代码，我们分析发现kvoPerson2在添加kvo之后发生了变化，我们通过断点来查看这两个对象的isa即类对象，根据一个类的类对象唯一性，kvoPerson1 和kvoPerson2的类对象
 应该一致：
 但是😲😲😲😲：
+![kvo-isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-isa.png)
+从上图的打印我们可以发现添加KVO之后，kvoPerson1的isa指向了一个新的类对象NSKVONotifying_KVOPerson
+下面分析setAge方法在添加kvo和没有添加时的左右：
+
