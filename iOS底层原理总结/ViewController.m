@@ -50,6 +50,7 @@
 	
 	KVOPerson *kvoPerson1 = [[KVOPerson alloc] init];
 	KVOPerson *kvoPerson2 = [[KVOPerson alloc] init];
+	KVOPerson *kvoPerson3 = [KVOPerson new];
 	kvoPerson1.age = 1;
 	kvoPerson2.age = 2;
 	
