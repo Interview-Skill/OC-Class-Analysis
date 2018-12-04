@@ -20,7 +20,49 @@ Runloop可以在需要的时候执行任务，在没有任务的时候进行休�
 ![runloop-image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runloop.jpg)
 
 # 如何开启RunLoop?
-1.
+1. 主线程Runloop:主线程runloop是在UIApplicationMain函数中启动的，主线程一启动会立刻创建一个runloop.
+```php
+int main(int argc, char * argv[]) {
+	@autoreleasepool {
+	    return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+	}
+}
+```
+进入UIApplicationMain函数中：
+```php
+// If nil is specified for principalClassName, the value for NSPrincipalClass from the Info.plist is used. If there is no
+// NSPrincipalClass key specified, the UIApplication class is used. The delegate class will be instantiated using init.
+UIKIT_EXTERN int UIApplicationMain(int argc, char * _Nullable argv[_Nonnull], NSString * _Nullable principalClassName, NSString * _Nullable delegateClassName);
+```
+上面这个函数式返回值是一个Int值，我们可以对main函数做出修改：
+```php
+int main(int argc, char * argv[]) {
+	@autoreleasepool {
+		NSLog(@"begin");
+		int re = UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+		NSLog(@"end");
+		return re;
+	}
+}
+```
+运行之后发现只打印”begin"；
+> UIApplicationMain函数中开启了一个和主线程有关的runloop，导致UIApplicationMain函数不返回，一直运行；
+
+```php
+void CFRunLoopRun(void) {	/* DOES CALLOUT */
+    int32_t result;
+    do {
+        result = CFRunLoopRunSpecific(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 1.0e10, false);
+        CHECK_FOR_FORK();
+    } while (kCFRunLoopRunStopped != result && kCFRunLoopRunFinished != result);
+}
+```
+从CFRunloopRef源码中我们也可以看到确实是一个do-while循环。
+
+# RunLoop对象
+###### 1. NSRunLoop对象 --> Fundation框架，基于CFRunLoopRef的封装；非线性安全的；
+###### 2. CFRunLoopRef对象 --> CoreFoundation;线程安全的；
+
 
 
 
