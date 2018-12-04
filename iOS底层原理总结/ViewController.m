@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "PersonOne.h"
+#import "KVOPerson.h"
 #import <objc/runtime.h>
 
 @interface ViewController ()
@@ -46,7 +47,21 @@
 	Class metaObjectClass1 = object_getClass([NSObject class]);
 	Class metaObjectClass2 = [NSObject class];
 	NSLog(@"%p %p", metaObjectClass1, metaObjectClass2);
+	
+	KVOPerson *kvoPerson1 = [[KVOPerson alloc] init];
+	KVOPerson *kvoPerson2 = [[KVOPerson alloc] init];
+	kvoPerson1.age = 1;
+	kvoPerson2.age = 2;
+	
+	[kvoPerson1 addObserver:self forKeyPath:@"age" options:NSKeyValueObservingOptionNew context:nil];
+	kvoPerson1.age = 10;
+	kvoPerson2.age = 12;
 
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
+{
+	NSLog(@"receive %@", change);
 }
 
 

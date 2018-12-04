@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		481E5A8221B61623004BFEA8 /* KVOPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 481E5A8121B61623004BFEA8 /* KVOPerson.m */; };
 		48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA6FE21B2C18300B32374 /* AppDelegate.m */; };
 		48CDA70221B2C18300B32374 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA70121B2C18300B32374 /* ViewController.m */; };
 		48CDA70521B2C18300B32374 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48CDA70321B2C18300B32374 /* Main.storyboard */; };
@@ -37,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		481E5A8021B61623004BFEA8 /* KVOPerson.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KVOPerson.h; sourceTree = "<group>"; };
+		481E5A8121B61623004BFEA8 /* KVOPerson.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KVOPerson.m; sourceTree = "<group>"; };
 		48CDA6FA21B2C18300B32374 /* iOS底层原理总结.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS底层原理总结.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CDA6FD21B2C18300B32374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48CDA6FE21B2C18300B32374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -193,6 +196,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		481E5A7C21B615E8004BFEA8 /* KVO-Investegate */ = {
+			isa = PBXGroup;
+			children = (
+				481E5A8021B61623004BFEA8 /* KVOPerson.h */,
+				481E5A8121B61623004BFEA8 /* KVOPerson.m */,
+			);
+			path = "KVO-Investegate";
+			sourceTree = "<group>";
+		};
 		48CDA6F121B2C18300B32374 = {
 			isa = PBXGroup;
 			children = (
@@ -214,17 +226,13 @@
 		48CDA6FC21B2C18300B32374 /* iOS底层原理总结 */ = {
 			isa = PBXGroup;
 			children = (
+				481E5A7C21B615E8004BFEA8 /* KVO-Investegate */,
 				48CDA7EF21B4362000B32374 /* objc4-723 */,
-				48CDA72921B418E900B32374 /* OC结构 */,
+				48CDA72921B418E900B32374 /* Instance-Investegate */,
 				48CDA6FD21B2C18300B32374 /* AppDelegate.h */,
 				48CDA6FE21B2C18300B32374 /* AppDelegate.m */,
 				48CDA70021B2C18300B32374 /* ViewController.h */,
 				48CDA70121B2C18300B32374 /* ViewController.m */,
-				48CDA72521B3648D00B32374 /* Student.h */,
-				48CDA72621B3648D00B32374 /* Student.m */,
-				48CDA72121B3647600B32374 /* main.cpp */,
-				48CDA72221B3647600B32374 /* ViewController.cpp */,
-				48CDA72821B369C700B32374 /* Student.cpp */,
 				48CDA70321B2C18300B32374 /* Main.storyboard */,
 				48CDA70621B2C18400B32374 /* Assets.xcassets */,
 				48CDA70821B2C18400B32374 /* LaunchScreen.storyboard */,
@@ -243,15 +251,20 @@
 			path = "iOS底层原理总结UITests";
 			sourceTree = "<group>";
 		};
-		48CDA72921B418E900B32374 /* OC结构 */ = {
+		48CDA72921B418E900B32374 /* Instance-Investegate */ = {
 			isa = PBXGroup;
 			children = (
+				48CDA72521B3648D00B32374 /* Student.h */,
+				48CDA72621B3648D00B32374 /* Student.m */,
+				48CDA72121B3647600B32374 /* main.cpp */,
+				48CDA72221B3647600B32374 /* ViewController.cpp */,
+				48CDA72821B369C700B32374 /* Student.cpp */,
 				48CDA72A21B4190300B32374 /* PersonOne.h */,
 				48CDA72B21B4190300B32374 /* PersonOne.m */,
 				48CDA72D21B41D6A00B32374 /* StuentOne.h */,
 				48CDA72E21B41D6A00B32374 /* StuentOne.m */,
 			);
-			path = "OC结构";
+			path = "Instance-Investegate";
 			sourceTree = "<group>";
 		};
 		48CDA7EF21B4362000B32374 /* objc4-723 */ = {
@@ -539,6 +552,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				481E5A8221B61623004BFEA8 /* KVOPerson.m in Sources */,
 				48CDA72C21B4190300B32374 /* PersonOne.m in Sources */,
 				48CDA70221B2C18300B32374 /* ViewController.m in Sources */,
 				48CDA70D21B2C18400B32374 /* main.m in Sources */,
