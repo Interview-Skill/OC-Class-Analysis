@@ -144,7 +144,7 @@ CF_EXPORT CFRunLoopRef _CFRunLoopGet0(pthread_t t) {
 
 # RunLoop结构分析
 先来看下RunLoop在内存中是如何布局的：
-
+<strong>__CFRunLoop</strong>
 ```php
 struct __CFRunLoop {
     CFRuntimeBase _base;
@@ -163,9 +163,59 @@ struct __CFRunLoop {
     CFTypeRef _counterpart;
 };
 ```
+重点我们看这四个成员变量：
+```php
+CFMutableSetRef _commonModes;
+CFMutableSetRef _commonModeItems;
+CFRunLoopModeRef _currentMode;
+CFMutableSetRef _modes;
+```
+而CFRunLoopModeRef都是指向__CFRunLoopMode结构体的指针：
+<strong>__CFRunLoop</strong>
+```php
+typedef struct __CFRunLoopMode *CFRunLoopModeRef;
+struct __CFRunLoopMode {
+    CFRuntimeBase _base;
+    pthread_mutex_t _lock;	/* must have the run loop locked before locking this */
+    CFStringRef _name;
+    Boolean _stopped;
+    char _padding[3];
+    CFMutableSetRef _sources0;
+    CFMutableSetRef _sources1;
+    CFMutableArrayRef _observers;
+    CFMutableArrayRef _timers;
+    CFMutableDictionaryRef _portToV1SourceMap;
+    __CFPortSet _portSet;
+    CFIndex _observerMask;
+#if USE_DISPATCH_SOURCE_FOR_TIMERS
+    dispatch_source_t _timerSource;
+    dispatch_queue_t _queue;
+    Boolean _timerFired; // set to true by the source when a timer has fired
+    Boolean _dispatchTimerArmed;
+#endif
+#if USE_MK_TIMER_TOO
+    mach_port_t _timerPort;
+    Boolean _mkTimerArmed;
+#endif
+#if DEPLOYMENT_TARGET_WINDOWS
+    DWORD _msgQMask;
+    void (*_msgPump)(void);
+#endif
+    uint64_t _timerSoftDeadline; /* TSR */
+    uint64_t _timerHardDeadline; /* TSR */
+};
+```
+在mode结构中我们主要注意以下成员变量：
+```php
+CFMutableSetRef _sources0;
+CFMutableSetRef _sources1;
+CFMutableArrayRef _observers;
+CFMutableArrayRef _timers;
+```
 
+![runloop-mode]()
 
-
+> <strong>总结：CFRunLoopModeRef代表RunLoop的运行模式，一个RunLoop包含若干的Mode，每个mode又包含若干的Source0/Source1/Timer/Observer,而runLoop只能选择其中一个mode座位currentMode </strong>
 
 
 
@@ -190,3 +240,4 @@ struct __CFRunLoop {
 > 3. [RunLoop](https://www.jianshu.com/p/de752066d0ad)
 > 4. [blog.ibireme](https://blog.ibireme.com/2015/05/18/runloop/)
 > 5. [runloop-apple](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html#//apple_ref/doc/uid/10000057i-CH16)
+> 6. [iOS刨根问底-深入理解RunLoop](http://www.cnblogs.com/kenshincui/p/6823841.html)
