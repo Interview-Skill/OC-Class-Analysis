@@ -240,6 +240,17 @@ dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), di
 ```
 ![Source0](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/source00.png)
 
+3. Timers: 定时器，NSTimer
+验证：
+```php
+[NSTimer scheduledTimerWithTimeInterval:3 repeats:NO block:^(NSTimer * _Nonnull timer) {
+	NSLog(@"timer begin");
+}];
+```
+![Timer](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/timer.png)
+
+4. Observer: 监听器，用户监听RunLoop状态
+
 
 
 
