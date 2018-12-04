@@ -39,7 +39,7 @@ iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）<b
 
 ### 验证KVO底层实现
 
-1.通过打印方法实现的地址来看一下kvoPerson1和kvoPerson2的setage的方法实现的地址在添加KVO前后有什么变化。
+###### 通过打印方法实现的地址来看一下kvoPerson1和kvoPerson2的setage的方法实现的地址在添加KVO前后有什么变化。
 ```php
 // 通过methodForSelector找到方法实现的地址
 NSLog(@"添加KVO监听之前 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
@@ -49,6 +49,19 @@ NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueOb
 
 NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
 ```
-![set-age-method]()
+![set-age-method](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/setage.png)
+验证了kvoPerson1的setAge方法的实现由Person类方法中的setAge方法转换为了C语言的Foundation框架的_NSsetIntValueAndNotify函数
+> Foundation框架中会根据属性的类型，调用不同的方法。例如我们之前定义的int类型的age属性，那么我们看到Foundation框架中调用的_NSsetIntValueAndNotify函数。那么我们把age的属性类型变为double重新打印一遍
+
+```php
+2018-12-04 14:49:28.250496+0800 iOS底层原理总结[20413:1682945] 添加KVO监听之前 - p1 = 0x104fdca70, p2 = 0x104fdca70
+2018-12-04 14:49:31.316144+0800 iOS底层原理总结[20413:1682945] 添加KVO监听之后 - p1 = 0x105337d7c, p2 = 0x104fdca70
+(lldb) p (IMP)0x105337d7c
+(IMP) $0 = 0x0000000105337d7c (Foundation`_NSSetDoubleValueAndNotify)
+(lldb) p (IMP)0x104fdca70
+(IMP) $1 = 0x0000000104fdca70 (iOS底层原理总结`-[KVOPerson setAge:] at KVOPerson.h:15)
+(lldb) 
+```
+所以我们可以推测Foundation框架中还有很多例如_NSSetBoolValueAndNotify、_NSSetCharValueAndNotify、_NSSetFloatValueAndNotify、_NSSetLongValueAndNotify等等函数；
 
 
