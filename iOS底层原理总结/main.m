@@ -16,7 +16,10 @@ int main(int argc, char * argv[]) {
 		Student *stu = [[Student alloc] init];
 		stu -> _no = 4;
 		stu -> _age = 5;
+		stu.name = @"li";
 		
+		Class studentClass = [stu class];
+		Class studentMetaClass = [Student class];
 		NSLog(@"%@",stu);
 		NSLog(@"%zd,%zd", class_getInstanceSize([NSObject class]) ,class_getInstanceSize([Student class]));
 	    return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));

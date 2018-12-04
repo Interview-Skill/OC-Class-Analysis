@@ -10,4 +10,14 @@
 
 @implementation Student
 
+- (void)studentName
+{
+	
+}
+
+- (void)studentAddress
+{
+	
+}
+
 @end

@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/main.m"
-            timestampString = "565458891.006358"
+            timestampString = "565579576.987174"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "16"
@@ -25,12 +25,28 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/main.m"
-            timestampString = "565458891.006475"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
+            timestampString = "565577665.1819839"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "19"
-            endingLineNumber = "19"
+            startingLineNumber = "23"
+            endingLineNumber = "23"
+            landmarkName = "-viewDidLoad"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/main.m"
+            timestampString = "565579576.9876029"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "23"
+            endingLineNumber = "23"
             landmarkName = "main"
             landmarkType = "9">
          </BreakpointContent>

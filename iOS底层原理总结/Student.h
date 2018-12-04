@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 	NSString *address;
 }
 @property (nonatomic, strong) NSString *name;
+
+- (void)studentName;
+- (void)studentAddress;
 @end
 
 NS_ASSUME_NONNULL_END
