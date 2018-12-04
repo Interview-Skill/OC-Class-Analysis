@@ -213,9 +213,32 @@ CFMutableArrayRef _observers;
 CFMutableArrayRef _timers;
 ```
 
-![runloop-mode]()
+![runloop-mode](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runloop-mode.png)
 
 > <strong>总结：CFRunLoopModeRef代表RunLoop的运行模式，一个RunLoop包含若干的Mode，每个mode又包含若干的Source0/Source1/Timer/Observer,而runLoop只能选择其中一个mode座位currentMode </strong>
+
+### Source0/Source1/Timers/Observers代表什么？
+
+1. Source1: 基于Port的线程间通信
+2. Source0: 触摸事件，PerformSelectors
+断点验证：
+
+```php
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+	NSLog(@"touch screen");
+}
+```
+通过在控制台输入<strong>bt</strong>查看完整的堆栈信息：
+![Source0](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/source0.png)
+
+同样我们验证下performSelector堆栈信息
+```php
+dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+	[self performSelectorOnMainThread:@selector(test) withObject:nil waitUntilDone:YES];
+});
+```
+![Source0](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/source00.png)
 
 
 
