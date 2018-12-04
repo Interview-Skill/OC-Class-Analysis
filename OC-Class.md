@@ -96,5 +96,5 @@ struct class_ro_t {
 };
 ```
 一张图总结：
-
+![struct-objcet](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/struct_object.png)
 
