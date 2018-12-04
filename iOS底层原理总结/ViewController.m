@@ -97,5 +97,14 @@
 	free(methods);
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+	NSLog(@"touch screen");
+	[self performSelector:@selector(test) withObject:nil];
+}
 
+- (void)test
+{
+	NSLog(@"perform selector");
+}
 @end
