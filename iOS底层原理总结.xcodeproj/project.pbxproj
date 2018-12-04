@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		481E5A8221B61623004BFEA8 /* KVOPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 481E5A8121B61623004BFEA8 /* KVOPerson.m */; };
+		481E5A8821B61BEA004BFEA8 /* OC-KVO.md in Resources */ = {isa = PBXBuildFile; fileRef = 481E5A8521B61BEA004BFEA8 /* OC-KVO.md */; };
+		481E5A8921B61BEA004BFEA8 /* OC-Instance.md in Resources */ = {isa = PBXBuildFile; fileRef = 481E5A8621B61BEA004BFEA8 /* OC-Instance.md */; };
+		481E5A8A21B61BEA004BFEA8 /* OC-Class.md in Resources */ = {isa = PBXBuildFile; fileRef = 481E5A8721B61BEA004BFEA8 /* OC-Class.md */; };
 		48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA6FE21B2C18300B32374 /* AppDelegate.m */; };
 		48CDA70221B2C18300B32374 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA70121B2C18300B32374 /* ViewController.m */; };
 		48CDA70521B2C18300B32374 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48CDA70321B2C18300B32374 /* Main.storyboard */; };
@@ -40,6 +43,9 @@
 /* Begin PBXFileReference section */
 		481E5A8021B61623004BFEA8 /* KVOPerson.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KVOPerson.h; sourceTree = "<group>"; };
 		481E5A8121B61623004BFEA8 /* KVOPerson.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KVOPerson.m; sourceTree = "<group>"; };
+		481E5A8521B61BEA004BFEA8 /* OC-KVO.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "OC-KVO.md"; sourceTree = "<group>"; };
+		481E5A8621B61BEA004BFEA8 /* OC-Instance.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "OC-Instance.md"; sourceTree = "<group>"; };
+		481E5A8721B61BEA004BFEA8 /* OC-Class.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "OC-Class.md"; sourceTree = "<group>"; };
 		48CDA6FA21B2C18300B32374 /* iOS底层原理总结.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS底层原理总结.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CDA6FD21B2C18300B32374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48CDA6FE21B2C18300B32374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -205,6 +211,16 @@
 			path = "KVO-Investegate";
 			sourceTree = "<group>";
 		};
+		481E5A8421B61BEA004BFEA8 /* MarkDown */ = {
+			isa = PBXGroup;
+			children = (
+				481E5A8521B61BEA004BFEA8 /* OC-KVO.md */,
+				481E5A8621B61BEA004BFEA8 /* OC-Instance.md */,
+				481E5A8721B61BEA004BFEA8 /* OC-Class.md */,
+			);
+			path = MarkDown;
+			sourceTree = SOURCE_ROOT;
+		};
 		48CDA6F121B2C18300B32374 = {
 			isa = PBXGroup;
 			children = (
@@ -226,6 +242,7 @@
 		48CDA6FC21B2C18300B32374 /* iOS底层原理总结 */ = {
 			isa = PBXGroup;
 			children = (
+				481E5A8421B61BEA004BFEA8 /* MarkDown */,
 				481E5A7C21B615E8004BFEA8 /* KVO-Investegate */,
 				48CDA7EF21B4362000B32374 /* objc4-723 */,
 				48CDA72921B418E900B32374 /* Instance-Investegate */,
@@ -534,7 +551,10 @@
 			files = (
 				48CDA70A21B2C18400B32374 /* LaunchScreen.storyboard in Resources */,
 				48CDA70721B2C18400B32374 /* Assets.xcassets in Resources */,
+				481E5A8921B61BEA004BFEA8 /* OC-Instance.md in Resources */,
+				481E5A8A21B61BEA004BFEA8 /* OC-Class.md in Resources */,
 				48CDA70521B2C18300B32374 /* Main.storyboard in Resources */,
+				481E5A8821B61BEA004BFEA8 /* OC-KVO.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
