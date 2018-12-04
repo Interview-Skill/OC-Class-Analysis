@@ -116,4 +116,39 @@ NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector
 1. 重写了setAge方法
 2. 重写了class方法
 NSKVONotifyin_Person重写class方法是为了隐藏NSKVONotifyin_Person。不被外界所看到。我们在p1添加过KVO监听之后，分别打印p1和p2对象的class可以发现他们都返回Person。如果NSKVONotifyin_Person不重写class方法，那么当对象要调用class对象方法的时候就会一直向上找来到nsobject，而nsobect的class的实现大致为返回自己isa指向的类，返回p1的isa指向的类那么打印出来的类就是NSKVONotifyin_Person
+猜测NSKVONotifyin_Person内重写的class内部实现大致为：
+```php
+- (Class) class {
+     // 得到类对象，在找到类对象父类
+     return class_getSuperclass(object_getClass(self));
+}
+```
+#### didChangeValueForKey:内部会调用observer的observeValueForKeyPath:ofObject:change:context:方法
 
+我们通过重写Person的willChangeValueForKey 和didChangeValueForKey来验证在didChangeValueForKey内部调用observer的方法；
+
+```php
+- (void)setAge:(int)age
+{
+    NSLog(@"setAge:");
+    _age = age;
+}
+- (void)willChangeValueForKey:(NSString *)key
+{
+    NSLog(@"willChangeValueForKey: - begin");
+    [super willChangeValueForKey:key];
+    NSLog(@"willChangeValueForKey: - end");
+}
+- (void)didChangeValueForKey:(NSString *)key
+{
+    NSLog(@"didChangeValueForKey: - begin");
+    [super didChangeValueForKey:key];
+    NSLog(@"didChangeValueForKey: - end");
+}
+```
+## 总结：
+1.iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）
+答. 当一个对象使用了KVO监听，iOS系统会修改这个对象的isa指针，改为指向一个全新的通过Runtime动态创建的子类，子类拥有自己的set方法实现，set方法实现内部会顺序调用willChangeValueForKey方法、原来的setter方法实现、didChangeValueForKey方法，而didChangeValueForKey方法内部又会调用监听器的observeValueForKeyPath:ofObject:change:context:监听方法。
+
+2. 如何手动触发KVO？
+答. 被监听的属性的值被修改时，就会自动触发KVO。如果想要手动触发KVO，则需要我们自己调用willChangeValueForKey和didChangeValueForKey方法即可在不改变属性值的情况下手动触发KVO，并且这两个方法缺一不可。
