@@ -10,6 +10,7 @@
 #import "PersonOne.h"
 #import "KVOPerson.h"
 #import <objc/runtime.h>
+#import "Student.h"
 
 @interface ViewController ()
 
@@ -64,6 +65,15 @@
 //
 //	[self printClassMethod:object_getClass(kvoPerson1)];
 //	[self printClassMethod:object_getClass(kvoPerson2)];
+	Student *stu = [[Student alloc] init];
+	stu -> _no = 4;
+	stu -> _age = 5;
+	stu.name = @"li";
+	
+	Class studentClass = [stu class];
+	Class studentMetaClass = [Student class];
+	NSLog(@"%@",stu);
+	NSLog(@"%zd,%zd", class_getInstanceSize([NSObject class]) ,class_getInstanceSize([Student class]));
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
