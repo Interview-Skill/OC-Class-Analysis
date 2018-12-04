@@ -100,7 +100,10 @@
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
 	NSLog(@"touch screen");
-	[self performSelector:@selector(test) withObject:nil];
+//	[self performSelector:@selector(test) withObject:nil];
+	[NSTimer scheduledTimerWithTimeInterval:3 repeats:NO block:^(NSTimer * _Nonnull timer) {
+		NSLog(@"timer begin");
+	}];
 }
 
 - (void)test
