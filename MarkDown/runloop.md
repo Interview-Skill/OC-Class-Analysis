@@ -13,11 +13,14 @@ runloop是运行着的循环，在程序运行过程中循环做一些事情，�
 Runloop可以在需要的时候执行任务，在没有任务的时候进行休眠，充分节省CPU。
 
 # RunLoop基本作用
-1. <strong>保证线程持续运行不退出<strong>:我们程序一旦启动，就会开一个主线程，同时会创建主线程对应的<strong>RunLoop<strong>,runloop保证了主线不会退出
+1. <strong>保证线程持续运行不退出</strong>:我们程序一旦启动，就会开一个主线程，同时会创建主线程对应的<strong>RunLoop</strong>,runloop保证了主线不会退出
 ，同时使得主线程不断的接受用户操作事件。
-2. <strong>处理App的中各种事件<strong>，比如：触摸事件(Port源？)，定时器事件(Timer源)，Selector事件?
-3. <strong>节省CPU资源,提高程序性能<strong>,因为runloop保证了线程在没有事件处理的时候可以休眠，大大提高了程序性能。
-![runloop-image]()
+2. <strong>处理App的中各种事件</strong>，比如：触摸事件(Port源？)，定时器事件(Timer源)，Selector事件?
+3. <strong>节省CPU资源,提高程序性能</strong>,因为runloop保证了线程在没有事件处理的时候可以休眠，大大提高了程序性能。
+![runloop-image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runloop.jpg)
+
+# 如何开启RunLoop?
+1.
 
 
 
