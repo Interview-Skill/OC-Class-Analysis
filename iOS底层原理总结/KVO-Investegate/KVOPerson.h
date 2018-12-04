@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KVOPerson : NSObject
 
-@property (nonatomic, assign) int age;
+@property (nonatomic, assign) double age;
 @property (nonatomic, strong) NSString *address;
 
 @end

@@ -10,4 +10,23 @@
 
 @implementation KVOPerson
 
+- (void)setAge:(double)age
+{
+	_age = age;
+}
+
+- (void)willChangeValueForKey:(NSString *)key
+{
+	NSLog(@"willChangeValueForKey: --begin");
+	[super willChangeValueForKey:key];
+	NSLog(@"willChangeValueForKey: -- end");
+}
+
+- (void)didChangeValueForKey:(NSString *)key
+{
+	NSLog(@"didChangeValueForKey: --begin");
+	[super didChangeValueForKey:key];
+	NSLog(@"didChangeValueForKey: -- end");
+}
+
 @end

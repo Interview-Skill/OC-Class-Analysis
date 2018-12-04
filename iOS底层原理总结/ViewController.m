@@ -55,17 +55,36 @@
 	kvoPerson2.age = 2;
 	
 	// 通过methodForSelector找到方法实现的地址
-	NSLog(@"添加KVO监听之前 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
+//	NSLog(@"添加KVO监听之前 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
 	
 	NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld;
 	[kvoPerson1 addObserver:self forKeyPath:@"age" options:NSKeyValueObservingOptionNew context:nil];
-
-	NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
+	kvoPerson1.age = 100;
+//	NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector: @selector(setAge:)],[kvoPerson2 methodForSelector: @selector(setAge:)]);
+//
+//	[self printClassMethod:object_getClass(kvoPerson1)];
+//	[self printClassMethod:object_getClass(kvoPerson2)];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
 {
 	NSLog(@"receive %@", change);
+}
+
+- (void)printClassMethod:(Class)cls
+{
+	unsigned int count;
+	Method *methods = class_copyMethodList(cls, &count);
+	NSMutableString *methodNames = [NSMutableString string];
+	[methodNames appendFormat:@"%@ - ", cls];
+	for (int i = 0; i< count; i++) {
+		Method method = methods[i];
+		NSString *methodName = NSStringFromSelector(method_getName(method));
+		[methodNames appendString: methodName];
+		[methodNames appendString:@"--- "];
+	}
+	NSLog(@"%@",methodNames);
+	free(methods);
 }
 
 
