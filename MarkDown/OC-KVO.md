@@ -32,8 +32,6 @@ iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）<b
 ![kvo-isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-isa.png)
 从上图的打印我们可以发现添加KVO之后，kvoPerson1的isa指向了一个新的类对象NSKVONotifying_KVOPerson,这个类继承自KVOPerson类；所以当你使用kvoPerson1实例对象调用setAge方法时，会先根据isa指针找到新的类对象NSKVONotifying_KVOPerson,并且**重写了这个类的setAge方法**
 ![not-use-kvo](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-setage-before.png)
-添加KVO之后isa指针的指向：
-![use-kvo](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-setage.png)
 
 > NSKVONotifyin_Person中的setage方法中其实调用了 Fundation框架中C语言函数 _NSsetIntValueAndNotify，_NSsetIntValueAndNotify内部做的操作相当于，首先调用willChangeValueForKey 将要改变方法，之后调用父类的setage方法对成员变量赋值，最后调用didChangeValueForKey已经改变方法。didChangeValueForKey中会调用监听器的监听方法，最终来到监听者的observeValueForKeyPath方法中。
 
@@ -64,4 +62,58 @@ NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector
 ```
 所以我们可以推测Foundation框架中还有很多例如_NSSetBoolValueAndNotify、_NSSetCharValueAndNotify、_NSSetFloatValueAndNotify、_NSSetLongValueAndNotify等等函数；
 
+### NSKVONotifyin_Person内部结构
+1.NSKVONotifyin_Person作为Person的子类，其superclass指针指向Person类，
+2.NSKVONotifyin_Person内部一定对setAge方法做了单独的实现，那么NSKVONotifyin_Person同Person类的差别可能就在于其内存储的对象方法及实现不同。
+通过runtime分别打印Person类对象和NSKVONotifyin_Person类对象内存储的对象方法
+```php
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    Person *p1 = [[Person alloc] init];
+    p1.age = 1.0;
+    Person *p2 = [[Person alloc] init];
+    p1.age = 2.0;
+    // self 监听 p1的 age属性
+    NSKeyValueObservingOptions options = NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld;
+    [p1 addObserver:self forKeyPath:@"age" options:options context:nil];
+
+    [self printMethods: object_getClass(p2)];
+    [self printMethods: object_getClass(p1)];
+
+    [p1 removeObserver:self forKeyPath:@"age"];
+}
+
+- (void) printMethods:(Class)cls
+{
+    unsigned int count ;
+    Method *methods = class_copyMethodList(cls, &count);
+    NSMutableString *methodNames = [NSMutableString string];
+    [methodNames appendFormat:@"%@ - ", cls];
+    
+    for (int i = 0 ; i < count; i++) {
+        Method method = methods[i];
+        NSString *methodName  = NSStringFromSelector(method_getName(method));
+        
+        [methodNames appendString: methodName];
+        [methodNames appendString:@" "];
+        
+    }
+    
+    NSLog(@"%@",methodNames);
+    free(methods);
+}
+
+```
+```php
+2018-12-04 15:09:02.860320+0800 iOS底层原理总结[32970:1725940] NSKVONotifying_KVOPerson - setAge:--- class--- dealloc--- _isKVOA---
+2018-12-04 15:09:03.697160+0800 iOS底层原理总结[32970:1725940] KVOPerson - address--- .cxx_destruct--- setAddress:--- setAge:--- age---
+```
+通过上述代码我们发现NSKVONotifyin_Person中有4个对象方法。分别为setAge: class dealloc _isKVOA，那么至此我们可以画出NSKVONotifyin_Person的内存结构以及方法调用顺序。
+
+添加KVO之后isa指针的指向：
+![use-kvo](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-setage.png)
+1. 重写了setAge方法
+2. 重写了class方法
+NSKVONotifyin_Person重写class方法是为了隐藏NSKVONotifyin_Person。不被外界所看到。我们在p1添加过KVO监听之后，分别打印p1和p2对象的class可以发现他们都返回Person。如果NSKVONotifyin_Person不重写class方法，那么当对象要调用class对象方法的时候就会一直向上找来到nsobject，而nsobect的class的实现大致为返回自己isa指向的类，返回p1的isa指向的类那么打印出来的类就是NSKVONotifyin_Person
 
