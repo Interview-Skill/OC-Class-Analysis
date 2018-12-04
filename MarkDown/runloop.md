@@ -60,8 +60,27 @@ void CFRunLoopRun(void) {	/* DOES CALLOUT */
 从CFRunloopRef源码中我们也可以看到确实是一个do-while循环。
 
 # RunLoop对象
-###### 1. NSRunLoop对象 --> Fundation框架，基于CFRunLoopRef的封装；非线性安全的；
-###### 2. CFRunLoopRef对象 --> CoreFoundation;线程安全的；
+> 1. NSRunLoop对象 --> Fundation框架，基于CFRunLoopRef的封装；非线性安全的；
+> 2. CFRunLoopRef对象 --> CoreFoundation;线程安全的；
+
+#### 如何获取RunLoop对象
+苹果没有提供创建runloop的方法；仅仅提供了获取runloop的方法：
+```php
+Foundation
+[NSRunLoop CurrentRunLoop];//获取当前线程的Runloop
+[NSRunLoop mainRunLoop]; // 获取主线程的RunLoop
+
+CoreFoundation
+CFRunLoopGetCurrent();
+CFRunLoopGetMain();
+```
+
+# RunLoop和线程的关系
+> 1. 线程和RunLoop是一一对应的；一个线程存在仅存在至多一个Runloop;
+> 2. 线程RunLoop保持在一个全局的Dictionary中，@[key(线程)：value(RunLoop)]
+> 3. 主线程的RunLoop是默认开启的，子线程RunLoop需要手动创建；
+> 4. RunLoop在第一次获取时创建，在线程结束时销毁；
+#### 源码验证
 
 
 
