@@ -11,6 +11,7 @@
 #import "KVOPerson.h"
 #import <objc/runtime.h>
 #import "Student.h"
+#import "RunLoopChildViewController.h"
 
 @interface ViewController ()
 
@@ -20,6 +21,10 @@
 
 - (void)viewDidLoad {
 	[super viewDidLoad];
+	RunLoopChildViewController *vc = [RunLoopChildViewController new];
+	[self addChildViewController:vc];
+	[self.view addSubview:vc.view];
+	[self.view bringSubviewToFront:vc.view];
 	// Do any additional setup after loading the view, typically from a nib.
 	PersonOne *person = [[PersonOne alloc] init];//person 是一个instance变量
 	//可以使用class方法或者runtime获取
