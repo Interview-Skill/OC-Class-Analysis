@@ -147,7 +147,8 @@ NSKVONotifyin_Person重写class方法是为了隐藏NSKVONotifyin_Person。不�
 }
 ```
 ## 总结：
-1.iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）
+
+1. iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）
 答. 当一个对象使用了KVO监听，iOS系统会修改这个对象的isa指针，改为指向一个全新的通过Runtime动态创建的子类，子类拥有自己的set方法实现，set方法实现内部会顺序调用willChangeValueForKey方法、原来的setter方法实现、didChangeValueForKey方法，而didChangeValueForKey方法内部又会调用监听器的observeValueForKeyPath:ofObject:change:context:监听方法。
 
 2. 如何手动触发KVO？
