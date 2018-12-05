@@ -214,6 +214,8 @@
 		481E5B3821B6CB53004BFEA8 /* RunLoopView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunLoopView.m; sourceTree = "<group>"; };
 		481E5B3A21B6D1F5004BFEA8 /* RunLoopChildViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RunLoopChildViewController.h; sourceTree = "<group>"; };
 		481E5B3B21B6D1F5004BFEA8 /* RunLoopChildViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunLoopChildViewController.m; sourceTree = "<group>"; };
+		481E5B3D21B79858004BFEA8 /* category.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = category.md; sourceTree = "<group>"; };
+		481E5B3E21B79858004BFEA8 /* runloop.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = runloop.md; sourceTree = "<group>"; };
 		48CDA6FA21B2C18300B32374 /* iOS底层原理总结.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS底层原理总结.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CDA6FD21B2C18300B32374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48CDA6FE21B2C18300B32374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -385,6 +387,8 @@
 				481E5A8521B61BEA004BFEA8 /* OC-KVO.md */,
 				481E5A8621B61BEA004BFEA8 /* OC-Instance.md */,
 				481E5A8721B61BEA004BFEA8 /* OC-Class.md */,
+				481E5B3D21B79858004BFEA8 /* category.md */,
+				481E5B3E21B79858004BFEA8 /* runloop.md */,
 			);
 			path = MarkDown;
 			sourceTree = SOURCE_ROOT;
