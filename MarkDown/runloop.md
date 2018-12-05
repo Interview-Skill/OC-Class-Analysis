@@ -251,20 +251,277 @@ dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), di
 
 4. Observer: 监听器，用户监听RunLoop状态
 
+# RunLoop相关类及作用
+> 1. CFRunLoopRef - 获得当前RunLoop和主RunLoop
+> 2. CFRunLoopModeRef - RunLoop 运行模式，只能选择一种，在不同模式中做不同的操作
+> 3. CFRunLoopSourceRef - 事件源，输入源
+> 4. CFRunLoopTimerRef - 定时器时间
+> 5. CFRunLoopObserverRef - 观察者
 
+#### CFRunLoopModeRef
+1. 一个 RunLoop 包含若干个 Mode，每个Mode又包含若干个Source、Timer、Observer
+2. 每次RunLoop启动时，只能指定其中一个 Mode，这个Mode被称作 CurrentMode
+3. 如果需要切换Mode，只能退出RunLoop，再重新指定一个Mode进入，这样做主要是为了分隔开不同组的Source、Timer、Observer，让其互不影响
+4. 如果Mode里没有任何Source0/Source1/Timer/Observer，RunLoop会立马退出
+> 一种Mode中可以有多个Source(事件源，输入源，基于端口事件源例键盘触摸等) Observer(观察者，观察当前RunLoop运行状态) 和Timer(定时器事件源)。但是必须至少有一个Source或者Timer，因为如果Mode为空，RunLoop运行到空模式不会进行空转，就会立刻退出。
 
+##### 系统默认注册的5个Mode:
+```php
+1. kCFRunLoopDefaultMode：App的默认Mode，通常主线程是在这个Mode下运行
+2. UITrackingRunLoopMode：界面跟踪 Mode，用于 ScrollView 追踪触摸滑动，保证界面滑动时不受其他 Mode 影响
+3. UIInitializationRunLoopMode: 在刚启动 App 时第进入的第一个 Mode，启动完成后就不再使用，会切换到kCFRunLoopDefaultMode
+4. GSEventReceiveRunLoopMode: 接受系统事件的内部 Mode，通常用不到
+5. kCFRunLoopCommonModes: 这是一个占位用的Mode，作为标记kCFRunLoopDefaultMode和UITrackingRunLoopMode用，并不是一种真正的Mode
+```
 
+##### Mode间的切换
+Q: 当我们使用NSTimer每一段时间执行一些事情时滑动UIScrollView，NSTimer就会暂停，当我们停止滑动以后，NSTimer又会重新恢复的情况，我们通过一段代码来看一下:
+```php
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    // [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(show) userInfo:nil repeats:YES];
+    NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 target:self selector:@selector(show) userInfo:nil repeats:YES];
+    // 加入到RunLoop中才可以运行
+    // 1. 把定时器添加到RunLoop中，并且选择默认运行模式NSDefaultRunLoopMode = kCFRunLoopDefaultMode
+    // [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+    // 当textFiled滑动的时候，timer失效，停止滑动时，timer恢复
+    // 原因：当textFiled滑动的时候，RunLoop的Mode会自动切换成UITrackingRunLoopMode模式，因此timer失效，当停止滑动，RunLoop又会切换回NSDefaultRunLoopMode模式，因此timer又会重新启动了
+    
+    // 2. 当我们将timer添加到UITrackingRunLoopMode模式中，此时只有我们在滑动textField时timer才会运行
+    // [[NSRunLoop mainRunLoop] addTimer:timer forMode:UITrackingRunLoopMode];
+    
+    // 3. 那个如何让timer在两个模式下都可以运行呢？
+    // 3.1 在两个模式下都添加timer 是可以的，但是timer添加了两次，并不是同一个timer
+    // 3.2 使用站位的运行模式 NSRunLoopCommonModes标记，凡是被打上NSRunLoopCommonModes标记的都可以运行，下面两种模式被打上标签
+    //0 : <CFString 0x10b7fe210 [0x10a8c7a40]>{contents = "UITrackingRunLoopMode"}
+    //2 : <CFString 0x10a8e85e0 [0x10a8c7a40]>{contents = "kCFRunLoopDefaultMode"}
+    // 因此也就是说如果我们使用NSRunLoopCommonModes，timer可以在UITrackingRunLoopMode，kCFRunLoopDefaultMode两种模式下运行
+    [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+    NSLog(@"%@",[NSRunLoop mainRunLoop]);
+}
+-(void)show
+{
+    NSLog(@"-------");
+}
 
+```
+> 总结：想要保证Timer正常工作，就需要手动将Timer添加到commonMode中
 
+```php
 
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    NSLog(@"%s",__func__);
+    // performSelector默认是在default模式下运行，因此在滑动ScrollView时，图片不会加载
+    // [self.imageView performSelector:@selector(setImage:) withObject:[UIImage imageNamed:@"abc"] afterDelay:2.0 ];
+    // inModes: 传入Mode数组
+    [self.imageView performSelector:@selector(setImage:) withObject:[UIImage imageNamed:@"abc"] afterDelay:2.0 inModes:@[NSDefaultRunLoopMode,UITrackingRunLoopMode]];
+    
+}
+```
+再看一个GCD的例子：
+```php
 
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    //创建队列
+    dispatch_queue_t queue = dispatch_get_global_queue(0, 0);
+    //1.创建一个GCD定时器
+    /*
+     第一个参数:表明创建的是一个定时器
+     第四个参数:队列
+     */
+    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    // 需要对timer进行强引用，保证其不会被释放掉，才会按时调用block块
+    // 局部变量，让指针强引用
+    self.timer = timer;
+    //2.设置定时器的开始时间,间隔时间,精准度
+    /*
+     第1个参数:要给哪个定时器设置
+     第2个参数:开始时间
+     第3个参数:间隔时间
+     第4个参数:精准度 一般为0 在允许范围内增加误差可提高程序的性能
+     GCD的单位是纳秒 所以要*NSEC_PER_SEC
+     */
+    dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 2.0 * NSEC_PER_SEC, 0 * NSEC_PER_SEC);
+    
+    //3.设置定时器要执行的事情
+    dispatch_source_set_event_handler(timer, ^{
+        NSLog(@"---%@--",[NSThread currentThread]);
+    });
+    // 启动
+    dispatch_resume(timer);
+}
 
+```
+#### CFRunLoopSourceRef事件源（输入源）
+Source分为两种:
+1. Source0：非基于Port的 用于用户主动触发的事件（点击button 或点击屏幕）
+2. Source1：基于Port的 通过内核和其他线程相互发送消息（与内核相关）
 
+#### CFRunLoopObserverRef
+CFRunLoopObserverRef是观察者，能够监听RunLoop的状态改变
+```php
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+     //创建监听者
+     /*
+     第一个参数 CFAllocatorRef allocator：分配存储空间 CFAllocatorGetDefault()默认分配
+     第二个参数 CFOptionFlags activities：要监听的状态 kCFRunLoopAllActivities 监听所有状态
+     第三个参数 Boolean repeats：YES:持续监听 NO:不持续
+     第四个参数 CFIndex order：优先级，一般填0即可
+     第五个参数 ：回调 两个参数observer:监听者 activity:监听的事件
+     */
+     /*
+     所有事件
+     typedef CF_OPTIONS(CFOptionFlags, CFRunLoopActivity) {
+     kCFRunLoopEntry = (1UL << 0),   //   即将进入RunLoop
+     kCFRunLoopBeforeTimers = (1UL << 1), // 即将处理Timer
+     kCFRunLoopBeforeSources = (1UL << 2), // 即将处理Source
+     kCFRunLoopBeforeWaiting = (1UL << 5), //即将进入休眠
+     kCFRunLoopAfterWaiting = (1UL << 6),// 刚从休眠中唤醒
+     kCFRunLoopExit = (1UL << 7),// 即将退出RunLoop
+     kCFRunLoopAllActivities = 0x0FFFFFFFU
+     };
+     */
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(CFAllocatorGetDefault(), kCFRunLoopAllActivities, YES, 0, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+        switch (activity) {
+            case kCFRunLoopEntry:
+                NSLog(@"RunLoop进入");
+                break;
+            case kCFRunLoopBeforeTimers:
+                NSLog(@"RunLoop要处理Timers了");
+                break;
+            case kCFRunLoopBeforeSources:
+                NSLog(@"RunLoop要处理Sources了");
+                break;
+            case kCFRunLoopBeforeWaiting:
+                NSLog(@"RunLoop要休息了");
+                break;
+            case kCFRunLoopAfterWaiting:
+                NSLog(@"RunLoop醒来了");
+                break;
+            case kCFRunLoopExit:
+                NSLog(@"RunLoop退出了");
+                break;
+                
+            default:
+                break;
+        }
+    });
+    
+    // 给RunLoop添加监听者
+    /*
+     第一个参数 CFRunLoopRef rl：要监听哪个RunLoop,这里监听的是主线程的RunLoop
+     第二个参数 CFRunLoopObserverRef observer 监听者
+     第三个参数 CFStringRef mode 要监听RunLoop在哪种运行模式下的状态
+     */
+    CFRunLoopAddObserver(CFRunLoopGetCurrent(), observer, kCFRunLoopDefaultMode);
+     /*
+     CF的内存管理（Core Foundation）
+     凡是带有Create、Copy、Retain等字眼的函数，创建出来的对象，都需要在最后做一次release
+     GCD本来在iOS6.0之前也是需要我们释放的，6.0之后GCD已经纳入到了ARC中，所以我们不需要管了
+     */
+    CFRelease(observer);
+}
 
+```
 
+#### RunLoop处理逻辑
+![RunLoop-logic](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runloop-time.png)
 
+#### RunLoop退出
+1. 线程销毁，RunLoop退出
+2. Mode中有一些Timer 、Source、 Observer，这些保证Mode不为空时保证RunLoop没有空转并且是在运行的，当Mode中为空的时候，RunLoop会立刻退出
+3. 我们在启动RunLoop的时候可以设置什么时候停止
+```php
+[NSRunLoop currentRunLoop]runUntilDate:<#(nonnull NSDate *)#>
+[NSRunLoop currentRunLoop]runMode:<#(nonnull NSString *)#> beforeDate:<#(nonnull NSDate *)#>
+```
 
+### RunLoop应用
 
+#### 1. 常驻线程：我们知道，当子线程中的任务执行完毕之后就被销毁了，那么如果我们需要开启一个子线程，在程序运行过程中永远都存在，那么我们就会面临一个问题，如何让子线程永远活着，这时就要用到常驻线程：给子线程开启一个RunLoop
+> 子线程执行完操作之后就会立即释放，即使我们使用强引用引用子线程使子线程不被释放，也不能给子线程再次添加操作，或者再次开启。
+```php
+#import "ViewController.h"
+
+@interface ViewController ()
+@property(nonatomic,strong)NSThread *thread;
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+}
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+   // 创建子线程并开启
+    NSThread *thread = [[NSThread alloc]initWithTarget:self selector:@selector(show) object:nil];
+    self.thread = thread;
+    [thread start];
+}
+-(void)show
+{
+    // 注意：打印方法一定要在RunLoop创建开始运行之前，如果在RunLoop跑起来之后打印，RunLoop先运行起来，已经在跑圈了就出不来了，进入死循环也就无法执行后面的操作了。
+    // 但是此时点击Button还是有操作的，因为Button是在RunLoop跑起来之后加入到子线程的，当Button加入到子线程RunLoop就会跑起来
+    NSLog(@"%s",__func__);
+    // 1.创建子线程相关的RunLoop，在子线程中创建即可，并且RunLoop中要至少有一个Timer 或 一个Source 保证RunLoop不会因为空转而退出，因此在创建的时候直接加入
+    // 添加Source [NSMachPort port] 添加一个端口
+    [[NSRunLoop currentRunLoop] addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];
+    // 添加一个Timer
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(test) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];    
+    //创建监听者
+    CFRunLoopObserverRef observer = CFRunLoopObserverCreateWithHandler(CFAllocatorGetDefault(), kCFRunLoopAllActivities, YES, 0, ^(CFRunLoopObserverRef observer, CFRunLoopActivity activity) {
+        switch (activity) {
+            case kCFRunLoopEntry:
+                NSLog(@"RunLoop进入");
+                break;
+            case kCFRunLoopBeforeTimers:
+                NSLog(@"RunLoop要处理Timers了");
+                break;
+            case kCFRunLoopBeforeSources:
+                NSLog(@"RunLoop要处理Sources了");
+                break;
+            case kCFRunLoopBeforeWaiting:
+                NSLog(@"RunLoop要休息了");
+                break;
+            case kCFRunLoopAfterWaiting:
+                NSLog(@"RunLoop醒来了");
+                break;
+            case kCFRunLoopExit:
+                NSLog(@"RunLoop退出了");
+                break;
+            
+            default:
+                break;
+        }
+    });
+    // 给RunLoop添加监听者
+    CFRunLoopAddObserver(CFRunLoopGetCurrent(), observer, kCFRunLoopDefaultMode);
+    // 2.子线程需要开启RunLoop
+    [[NSRunLoop currentRunLoop]run];
+    CFRelease(observer);
+}
+- (IBAction)btnClick:(id)sender {
+    [self performSelector:@selector(test) onThread:self.thread withObject:nil waitUntilDone:NO];
+}
+-(void)test
+{
+    NSLog(@"%@",[NSThread currentThread]);
+}
+@end
+```
+
+#### 2. 自动释放池
+
+Timer和Source也是一些变量，需要占用一部分存储空间，所以要释放掉，如果不释放掉，就会一直积累，占用的内存也就越来越大，这显然不是我们想要的。
+那么什么时候释放，怎么释放呢？
+RunLoop内部有一个自动释放池，当RunLoop开启时，就会自动创建一个自动释放池，当RunLoop在休息之前会释放掉自动释放池的东西，然后重新创建一个新的空的自动释放池，当RunLoop被唤醒重新开始跑圈时，Timer,Source等新的事件就会放到新的自动释放池中，当RunLoop退出的时候也会被释放。
+注意：只有主线程的RunLoop会默认启动。也就意味着会自动创建自动释放池，子线程需要在线程调度方法中手动添加自动释放池。
 
 
 ****
