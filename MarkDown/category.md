@@ -457,9 +457,9 @@ memcpy(array()->lists, addedLists,
 ![memmove](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/array-move.png)
 
 可以看到之前的指针并没有改变，至始至终都指向开头的位置。并且经过了memmove和memcpy之后，分类的方法，属性，协议被放到了类对象原本的方法，属性，协议列表前面。
-
+<br>
 <strong>为什么将分类的方法追加到本来的对象方法列表的前面呢？这样做是为了保证分类方法优先调用。我们一般认为分类重写本类方法的时候，会覆盖本类的方法，
-其实并不是覆盖，只是优先调用，本类的方法仍然在内存中。</strong>
+其实并不是覆盖，只是优先调用，本类的方法仍然在内存中。</strong><br>
 下面我们验证下分类不是覆盖本类方法，只是优先调用：打印所有类的所有方法：
 ```php
 
@@ -816,15 +816,15 @@ void callInitialize(Class cls)
 
 文字总结：
 Q1: Category中有load方法吗?load方法在什么时候调用？load方法能继承吗？<br>
-A: Category中也有load方法，load方法在app启动程序加载类信息的时候调用，load方法可以继承，调用子类load方法会先调用父类方法。
+A: Category中也有load方法，load方法在app启动程序加载类信息的时候调用，load方法可以继承，调用子类load方法会先调用父类方法。<br>
 
 Q2:load 和 initialize的区别，以及在Category重写时候的调用次序？<br>
-A:区别在与调用时刻和调用方式：
-1.调用方式：load直接调用函数地址；initialize是通过objc_msgSend调用；
-2.调用时机：laod是runtime在加载类信息和分类信息的时候调用，（只会调用一次）；initialize是类第一次接收到消息的时候调用，每个类只会initialize一次，但是父类的initialize可能会调用多次；
+A:区别在与调用时刻和调用方式：<br>
+1.调用方式：load直接调用函数地址；initialize是通过objc_msgSend调用；<br>
+2.调用时机：laod是runtime在加载类信息和分类信息的时候调用，（只会调用一次）；initialize是类第一次接收到消息的时候调用，每个类只会initialize一次，但是父类的initialize可能会调用多次；<br>
 3.调用顺序：
-   1)load:父类 -> 子类 -> 分类
-   2)initialize: 父类 -> 子类(如果有)
+   1)load:父类 -> 子类 -> 分类<br>
+   2)initialize: 父类 -> 子类(如果有)<br>
    
    
    
