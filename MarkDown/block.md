@@ -1,0 +1,57 @@
+# 面试题：
+1. block原理是什么？本质是什么？
+2. __block作用是什么？有什么注意点？
+3. block的属性修饰词为什么是copy？使用block有哪些使用注意？
+4. block在修改NSMutableArray，需不需要使用__blcok?
+
+> 首先：block本质也是一个OC对象，内部也有一个isa指针。block是封装了函数调用以及函数调用环境的OC对象。
+
+## 探寻block的本质
+```php
+- (void)createBlock
+{
+	int age = 10;
+	void(^block)(int, int) = ^(int a, int b) {
+		NSLog(@"this is an block, a = %d, b = %d",a,b);
+		NSLog(@"this is an block, age = %d",age );
+	};
+	block(3,5);
+}
+```
+使用下面的命令将.m文件转化为C++
+```php
+xcrun -sdk iphonesimulator clang -rewrite-objc HaviBlock.m
+```
+下面是C++结构的block：
+
+```php
+struct __HaviBlock__createBlock_block_impl_0 {
+  struct __block_impl impl;
+  struct __HaviBlock__createBlock_block_desc_0* Desc;
+  int age;
+  __HaviBlock__createBlock_block_impl_0(void *fp, struct __HaviBlock__createBlock_block_desc_0 *desc, int _age, int flags=0) : age(_age) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+static void __HaviBlock__createBlock_block_func_0(struct __HaviBlock__createBlock_block_impl_0 *__cself, int a, int b) {
+  int age = __cself->age; // bound by copy
+
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_1ee770_mi_0,a,b);
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_1ee770_mi_1,age );
+ }
+
+static struct __HaviBlock__createBlock_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+} __HaviBlock__createBlock_block_desc_0_DATA = { 0, sizeof(struct __HaviBlock__createBlock_block_impl_0)};
+
+static void _I_HaviBlock_createBlock(HaviBlock * self, SEL _cmd) {
+ int age = 10;
+ void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__createBlock_block_impl_0((void *)__HaviBlock__createBlock_block_func_0, &__HaviBlock__createBlock_block_desc_0_DATA, age));
+ ((void (*)(__block_impl *, int, int))((__block_impl *)block)->FuncPtr)((__block_impl *)block, 3, 5);
+}
+
+```
