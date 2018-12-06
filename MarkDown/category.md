@@ -375,7 +375,7 @@ attachCategories(Class cls, category_list *cats, bool flush_caches)
 上述源码中可以看出，首先根据方法列表，属性列表，协议列表，malloc分配内存，根据多少个分类以及每一块方法需要多少内存来分配相应的内存地址。之后从分类数组里面往三个数组里面存放分类数组里面存放的分类方法，属性以及协议放入对应mlist、proplists、protolosts数组中，这三个数组放着所有分类的方法，属性和协议。
 之后通过类对象的data()方法，拿到类对象的class_rw_t结构体rw，在class结构中我们介绍过，class_rw_t中存放着类对象的方法，属性和协议等数据，rw结构体通过类对象的data方法获取，所以rw里面存放这类对象里面的数据。
 之后分别通过rw调用方法列表、属性列表、协议列表的attachList函数，将所有的分类的方法、属性、协议列表数组传进去，我们大致可以猜想到在attachList方法内部将分类和本类相应的对象方法，属性，和协议进行了合并。
-#### attachList方法
+#### 5.attachList方法
 ```php
 void attachLists(List* const * addedLists, uint32_t addedCount) {
 if (addedCount == 0) return;
@@ -455,6 +455,361 @@ memcpy(array()->lists, addedLists,
 
 ```
 ![memmove](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/array-move.png)
+
+可以看到之前的指针并没有改变，至始至终都指向开头的位置。并且经过了memmove和memcpy之后，分类的方法，属性，协议被放到了类对象原本的方法，属性，协议列表前面。
+
+<strong>为什么将分类的方法追加到本来的对象方法列表的前面呢？这样做是为了保证分类方法优先调用。我们一般认为分类重写本类方法的时候，会覆盖本类的方法，
+其实并不是覆盖，只是优先调用，本类的方法仍然在内存中。</strong>
+下面我们验证下分类不是覆盖本类方法，只是优先调用：打印所有类的所有方法：
+```php
+
+- (void)printMethodNamesOfClass:(Class)cls
+{
+    unsigned int count;
+    // 获得方法数组
+    Method *methodList = class_copyMethodList(cls, &count);
+    // 存储方法名
+    NSMutableString *methodNames = [NSMutableString string];
+    // 遍历所有的方法
+    for (int i = 0; i < count; i++) {
+        // 获得方法
+        Method method = methodList[i];
+        // 获得方法名
+        NSString *methodName = NSStringFromSelector(method_getName(method));
+        // 拼接方法名
+        [methodNames appendString:methodName];
+        [methodNames appendString:@", "];
+    }
+    // 释放
+    free(methodList);
+    // 打印方法名
+    NSLog(@"%@ - %@", cls, methodNames);
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];    
+    Preson *p = [[Preson alloc] init];
+    [p run];
+    [self printMethodNamesOfClass:[Preson class]];
+}
+
+```
+> 2018-12-06 20:31:57.162771+0800 iOS底层原理总结[49992:3220836] person (test2) run<br>
+2018-12-06 20:31:57.162918+0800 iOS底层原理总结[49992:3220836] CategoryPerson - test--- run--- run--- setAge:--- age---
+
+## 总结：
+### Q:Category的实现原理？以及为什么Category中只能添加方法不能添加属性？
+
+A:Category的实现原理就是将Category中的对象方法，协议，属性存放到category_t结构体中，然后将结构体中的方法列表拷贝到类对象的方法列表中。<br>
+Category中可以添加属性，但是不能帮你自动生成成员变量和get/set方法。因为在category_t结构体中并不存在成员变量。而且前面分析，成员变量是存在实例对象里面的，这个是在编译的时候就已经决定的。而分类是在运行时才去加载的。所以我们无法再程序运行的时候讲分类的成员变量添加到实例对象的结构体中。因此说分类不可以添加实例变量。
+
+### load 和 Initialize函数：
+
+#### 1.load函数式在程序启动就会调用：当加载类信息的时候就调用：
+
+```php
+//首先是在加载image的时候
+void
+load_images(const char *path __unused, const struct mach_header *mh)
+{
+    // Return without taking locks if there are no +load methods here.
+    if (!hasLoadMethods((const headerType *)mh)) return;
+
+    recursive_mutex_locker_t lock(loadMethodLock);
+
+    // Discover load methods
+    {
+        rwlock_writer_t lock2(runtimeLock);
+        prepare_load_methods((const headerType *)mh);
+    }
+
+    // Call +load methods (without runtimeLock - re-entrant)
+    call_load_methods();
+}
+//prepare_load_methods
+void prepare_load_methods(const headerType *mhdr)
+{
+    size_t count, i;
+
+    runtimeLock.assertWriting();
+
+    classref_t *classlist = 
+        _getObjc2NonlazyClassList(mhdr, &count);
+    for (i = 0; i < count; i++) {
+        schedule_class_load(remapClass(classlist[i]));
+    }
+
+    category_t **categorylist = _getObjc2NonlazyCategoryList(mhdr, &count);
+    for (i = 0; i < count; i++) {
+        category_t *cat = categorylist[i];
+        Class cls = remapClass(cat->cls);
+        if (!cls) continue;  // category for ignored weak-linked class
+        realizeClass(cls);
+        assert(cls->ISA()->isRealized());
+        add_category_to_loadable_list(cat);
+    }
+}
+//这里我们看到有个加载所有的load方法：
+call_load_methods
+/***********************************************************************
+* call_load_methods
+* Call all pending class and category +load methods.
+* Class +load methods are called superclass-first. 
+* Category +load methods are not called until after the parent class's +load.
+* 
+* This method must be RE-ENTRANT, because a +load could trigger 
+* more image mapping. In addition, the superclass-first ordering 
+* must be preserved in the face of re-entrant calls. Therefore, 
+* only the OUTERMOST call of this function will do anything, and 
+* that call will handle all loadable classes, even those generated 
+* while it was running.
+*
+* The sequence below preserves +load ordering in the face of 
+* image loading during a +load, and make sure that no 
+* +load method is forgotten because it was added during 
+* a +load call.
+* Sequence:
+* 1. Repeatedly call class +loads until there aren't any more
+* 2. Call category +loads ONCE.
+* 3. Run more +loads if:
+*    (a) there are more classes to load, OR
+*    (b) there are some potential category +loads that have 
+*        still never been attempted.
+* Category +loads are only run once to ensure "parent class first" 
+* ordering, even if a category +load triggers a new loadable class 
+* and a new loadable category attached to that class. 
+*
+* Locking: loadMethodLock must be held by the caller 
+*   All other locks must not be held.
+**********************************************************************/
+void call_load_methods(void)
+{
+    static bool loading = NO;
+    bool more_categories;
+
+    loadMethodLock.assertLocked();
+
+    // Re-entrant calls do nothing; the outermost call will finish the job.
+    if (loading) return;
+    loading = YES;
+
+    void *pool = objc_autoreleasePoolPush();
+
+    do {
+        // 1. Repeatedly call class +loads until there aren't any more
+        while (loadable_classes_used > 0) {
+            call_class_loads();//这里可以看到先调用类的load函数，后调用分类的
+        }
+
+        // 2. Call category +loads ONCE
+        more_categories = call_category_loads();
+
+        // 3. Run more +loads if there are classes OR more untried categories
+    } while (loadable_classes_used > 0  ||  more_categories);
+
+    objc_autoreleasePoolPop(pool);
+
+    loading = NO;
+}
+/***********************************************************************
+* call_class_loads
+* Call all pending class +load methods.
+* If new classes become loadable, +load is NOT called for them.
+*
+* Called only by call_load_methods().
+**********************************************************************/
+static void call_class_loads(void)
+{
+    int i;
+    
+    // Detach current loadable list.
+    struct loadable_class *classes = loadable_classes;
+    int used = loadable_classes_used;
+    loadable_classes = nil;
+    loadable_classes_allocated = 0;
+    loadable_classes_used = 0;
+    
+    // Call all +loads for the detached list.
+    for (i = 0; i < used; i++) {
+        Class cls = classes[i].cls;
+        load_method_t load_method = (load_method_t)classes[i].method;//******重点这里是直接通过内存地址调用的
+        if (!cls) continue; 
+
+        if (PrintLoading) {
+            _objc_inform("LOAD: +[%s load]\n", cls->nameForLogging());
+        }
+        (*load_method)(cls, SEL_load);
+    }
+    
+    // Destroy the detached list.
+    if (classes) free(classes);
+}
+
+```
+
+> 这里可以看出：先调用类的load函数后调用分类的；下面我们通过代码验证：
+```php
+2018-12-06 21:06:55.164044+0800 iOS底层原理总结[56809:3273926] Class Load
+2018-12-06 21:06:55.164670+0800 iOS底层原理总结[56809:3273926] Class subClass load
+2018-12-06 21:06:55.164743+0800 iOS底层原理总结[56809:3273926] Class catetory load
+
+<strong>调用顺序：父类->子类->分类
+``` 
+
+#### 2. initialize方法
+源码在objc_initialize.mm中
+```php
+/***********************************************************************
+* class_initialize.  Send the '+initialize' message on demand to any
+* uninitialized class. Force initialization of superclasses first.
+**********************************************************************/
+void _class_initialize(Class cls)
+{
+    assert(!cls->isMetaClass());
+
+    Class supercls;
+    bool reallyInitialize = NO;
+
+    // Make sure super is done initializing BEFORE beginning to initialize cls.
+    // See note about deadlock above.
+    supercls = cls->superclass;
+    if (supercls  &&  !supercls->isInitialized()) {
+        _class_initialize(supercls);
+    }
+    
+    // Try to atomically set CLS_INITIALIZING.
+    {
+        monitor_locker_t lock(classInitLock);
+        if (!cls->isInitialized() && !cls->isInitializing()) {
+            cls->setInitializing();
+            reallyInitialize = YES;
+        }
+    }
+    
+    if (reallyInitialize) {
+        // We successfully set the CLS_INITIALIZING bit. Initialize the class.
+        
+        // Record that we're initializing this class so we can message it.
+        _setThisThreadIsInitializingClass(cls);
+
+        if (MultithreadedForkChild) {
+            // LOL JK we don't really call +initialize methods after fork().
+            performForkChildInitialize(cls, supercls);
+            return;
+        }
+        
+        // Send the +initialize message.
+        // Note that +initialize is sent to the superclass (again) if 
+        // this class doesn't implement +initialize. 2157218
+        if (PrintInitializing) {
+            _objc_inform("INITIALIZE: thread %p: calling +[%s initialize]",
+                         pthread_self(), cls->nameForLogging());
+        }
+
+        // Exceptions: A +initialize call that throws an exception 
+        // is deemed to be a complete and successful +initialize.
+        //
+        // Only __OBJC2__ adds these handlers. !__OBJC2__ has a
+        // bootstrapping problem of this versus CF's call to
+        // objc_exception_set_functions().
+#if __OBJC2__
+        @try
+#endif
+        {
+            callInitialize(cls);
+
+            if (PrintInitializing) {
+                _objc_inform("INITIALIZE: thread %p: finished +[%s initialize]",
+                             pthread_self(), cls->nameForLogging());
+            }
+        }
+#if __OBJC2__
+        @catch (...) {
+            if (PrintInitializing) {
+                _objc_inform("INITIALIZE: thread %p: +[%s initialize] "
+                             "threw an exception",
+                             pthread_self(), cls->nameForLogging());
+            }
+            @throw;
+        }
+        @finally
+#endif
+        {
+            // Done initializing.
+            lockAndFinishInitializing(cls, supercls);
+        }
+        return;
+    }
+    
+    else if (cls->isInitializing()) {
+        // We couldn't set INITIALIZING because INITIALIZING was already set.
+        // If this thread set it earlier, continue normally.
+        // If some other thread set it, block until initialize is done.
+        // It's ok if INITIALIZING changes to INITIALIZED while we're here, 
+        //   because we safely check for INITIALIZED inside the lock 
+        //   before blocking.
+        if (_thisThreadIsInitializingClass(cls)) {
+            return;
+        } else if (!MultithreadedForkChild) {
+            waitForInitializeToComplete(cls);
+            return;
+        } else {
+            // We're on the child side of fork(), facing a class that
+            // was initializing by some other thread when fork() was called.
+            _setThisThreadIsInitializingClass(cls);
+            performForkChildInitialize(cls, supercls);
+        }
+    }
+    
+    else if (cls->isInitialized()) {
+        // Set CLS_INITIALIZING failed because someone else already 
+        //   initialized the class. Continue normally.
+        // NOTE this check must come AFTER the ISINITIALIZING case.
+        // Otherwise: Another thread is initializing this class. ISINITIALIZED 
+        //   is false. Skip this clause. Then the other thread finishes 
+        //   initialization and sets INITIALIZING=no and INITIALIZED=yes. 
+        //   Skip the ISINITIALIZING clause. Die horribly.
+        return;
+    }
+    
+    else {
+        // We shouldn't be here. 
+        _objc_fatal("thread-safe class init in objc runtime is buggy!");
+    }
+}
+
+//重点是下面的触发机制：
+void callInitialize(Class cls)
+{
+    ((void(*)(Class, SEL))objc_msgSend)(cls, SEL_initialize);
+    asm("");
+}
+
+```
+下面验证父类，子类，分类的initialize的调用顺序：
+
+  1)只有父类实现了initialize方法：
+```php
+  2018-12-06 21:10:22.850174+0800 iOS底层原理总结[57496:3280540] 父类 initialize
+  2018-12-06 21:10:22.850261+0800 iOS底层原理总结[57496:3280540] 父类 initialize
+  *这种情况父类调用两次：因为initialize是走的objc_msgSend，根据消息转发机制，会有两次！自己仔细考虑
+```
+  2）父类和子类实现了initialize方法：
+```php
+   2018-12-06 21:16:14.588343+0800 iOS底层原理总结[58647:3289450] 父类 initialize
+   2018-12-06 21:16:14.588407+0800 iOS底层原理总结[58647:3289450] 子类 initialize
+   这种情况就属于正常的函数调用
+```
+  3）父类，子类，分类都实现了initialize方法：
+```php
+   2018-12-06 21:18:06.508961+0800 iOS底层原理总结[59050:3292825] 分类 initialize
+   2018-12-06 21:18:06.512916+0800 iOS底层原理总结[59050:3292825] 子类 initialize
+   父类的方法会被覆盖（准确来说是分类的优先执行）,且优于子类的执行
+```
+
+
+## 总结：
+![load-VS-initialize]()
+
 
 
 
