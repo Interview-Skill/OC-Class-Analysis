@@ -349,19 +349,19 @@ attachCategories(Class cls, category_list *cats, bool flush_caches)
         property_list_t *proplist = 
             entry.cat->propertiesForMeta(isMeta, entry.hi);
         if (proplist) {
-            proplists[propcount++] = proplist;
+            proplists[propcount++] = proplist; //将一个类的所有分类的属性存到proplists
         }
 
         protocol_list_t *protolist = entry.cat->protocols;
         if (protolist) {
-            protolists[protocount++] = protolist;
+            protolists[protocount++] = protolist;//将一个类的所有的分类的协议方法存储到protolist
         }
     }
 
-    auto rw = cls->data();
+    auto rw = cls->data();//rw：class_rw_t结构体；class结构体中用来存储类对象的属性方法，协议和属性
 
     prepareMethodLists(cls, mlists, mcount, NO, fromBundle);
-    rw->methods.attachLists(mlists, mcount);
+    rw->methods.attachLists(mlists, mcount);//将分类的方法，协议，属性传递给rw对应的函数
     free(mlists);
     if (flush_caches  &&  mcount > 0) flushCaches(cls);
 
@@ -372,6 +372,67 @@ attachCategories(Class cls, category_list *cats, bool flush_caches)
     free(protolists);
 }
 ```
+上述源码中可以看出，首先根据方法列表，属性列表，协议列表，malloc分配内存，根据多少个分类以及每一块方法需要多少内存来分配相应的内存地址。之后从分类数组里面往三个数组里面存放分类数组里面存放的分类方法，属性以及协议放入对应mlist、proplists、protolosts数组中，这三个数组放着所有分类的方法，属性和协议。
+之后通过类对象的data()方法，拿到类对象的class_rw_t结构体rw，在class结构中我们介绍过，class_rw_t中存放着类对象的方法，属性和协议等数据，rw结构体通过类对象的data方法获取，所以rw里面存放这类对象里面的数据。
+之后分别通过rw调用方法列表、属性列表、协议列表的attachList函数，将所有的分类的方法、属性、协议列表数组传进去，我们大致可以猜想到在attachList方法内部将分类和本类相应的对象方法，属性，和协议进行了合并。
+#### attachList方法
+```php
+void attachLists(List* const * addedLists, uint32_t addedCount) {
+if (addedCount == 0) return;
+
+if (hasArray()) {
+    // many lists -> many lists
+    uint32_t oldCount = array()->count; //原来
+    uint32_t newCount = oldCount + addedCount;
+    setArray((array_t *)realloc(array(), array_t::byteSize(newCount)));
+    array()->count = newCount;
+    memmove(array()->lists + addedCount, array()->lists, 
+	    oldCount * sizeof(array()->lists[0]));
+    memcpy(array()->lists, addedLists, 
+	   addedCount * sizeof(array()->lists[0]));
+}
+else if (!list  &&  addedCount == 1) {
+    // 0 lists -> 1 list
+    list = addedLists[0];
+} 
+else {
+    // 1 list -> many lists
+    List* oldList = list;
+    uint32_t oldCount = oldList ? 1 : 0;
+    uint32_t newCount = oldCount + addedCount;
+    setArray((array_t *)malloc(array_t::byteSize(newCount)));
+    array()->count = newCount;
+    if (oldList) array()->lists[addedCount] = oldList;
+    memcpy(array()->lists, addedLists, 
+	   addedCount * sizeof(array()->lists[0]));
+   }
+}
+```
+上述源代码中有两个重要的数组
+> array()->lists： 类对象原来的方法列表，属性列表，协议列表。<br>
+> addedLists：传入所有分类的方法列表，属性列表，协议列表。<br>
+> attachLists函数中最重要的两个方法为memmove内存移动和memcpy内存拷贝。我们先来分别看一下这两个函数<br>
+
+```php
+// memmove ：内存移动。
+/*  __dst : 移动内存的目的地
+*   __src : 被移动的内存首地址
+*   __len : 被移动的内存长度
+*   将__src的内存移动__len块内存到__dst中
+*/
+void    *memmove(void *__dst, const void *__src, size_t __len);
+
+// memcpy ：内存拷贝。
+/*  __dst : 拷贝内存的拷贝目的地
+*   __src : 被拷贝的内存首地址
+*   __n : 被移动的内存长度
+*   将__src的内存移动__n块内存到__dst中
+*/
+void    *memcpy(void *__dst, const void *__src, size_t __n);
+
+```
+
+
 
 
 
