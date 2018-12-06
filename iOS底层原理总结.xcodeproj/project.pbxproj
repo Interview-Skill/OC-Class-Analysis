@@ -610,6 +610,13 @@
 			path = Category;
 			sourceTree = "<group>";
 		};
+		48AA46B921B9654700378F24 /* Block */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Block;
+			sourceTree = "<group>";
+		};
 		48CDA6F121B2C18300B32374 = {
 			isa = PBXGroup;
 			children = (
@@ -631,6 +638,7 @@
 		48CDA6FC21B2C18300B32374 /* iOS底层原理总结 */ = {
 			isa = PBXGroup;
 			children = (
+				48AA46B921B9654700378F24 /* Block */,
 				482D733021B803EC00A83F0A /* Category */,
 				481E5A9121B6B76F004BFEA8 /* CFRunLoopRef-855.17 */,
 				481E5A8421B61BEA004BFEA8 /* MarkDown */,
