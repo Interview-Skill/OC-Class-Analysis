@@ -274,6 +274,8 @@ for (EACH_HEADER) {
 ```
 
 仔细的阅读这段代码，作用是来查找有没有分类的。通过_getObjc2CategoryList获取分类列表，进行遍历，获取其中的方法、协议、属性。最后调用<strong>remethodizeClass(cls)函数；
+
+#### 3. remethodizeClass
     
 ```php
 
@@ -303,6 +305,71 @@ static void remethodizeClass(Class cls)
         attachCategories(cls, cats, true /*flush caches*/);        
         free(cats);
     }
+}
+```
+从上面的代码我们看到最后是调用了AttachCategories函数，这个函数参数是类对象cls和分类数组cats；因为分类可以有多个，所以分类信息保存在category_t接头中，多个分类保存在category_list中；
+
+#### 4. attachCategories 开始给对象的类添加Category中的信息
+```php
+// Attach method lists and properties and protocols from categories to a class.
+// Assumes the categories in cats are all loaded and sorted by load order, 
+// oldest categories first.
+static void 
+attachCategories(Class cls, category_list *cats, bool flush_caches)
+{
+    if (!cats) return;
+    if (PrintReplacedMethods) printReplacements(cls, cats);
+
+    bool isMeta = cls->isMetaClass();
+
+    // fixme rearrange to remove these intermediate allocations
+    // 根据分类中的属性方法、属性、协议来分配内存
+    method_list_t **mlists = (method_list_t **)
+        malloc(cats->count * sizeof(*mlists));
+    property_list_t **proplists = (property_list_t **)
+        malloc(cats->count * sizeof(*proplists));
+    protocol_list_t **protolists = (protocol_list_t **)
+        malloc(cats->count * sizeof(*protolists));
+
+    // Count backwards through cats to get newest categories first
+    int mcount = 0;
+    int propcount = 0;
+    int protocount = 0;
+    int i = cats->count;
+    bool fromBundle = NO;
+    while (i--) {
+        auto& entry = cats->list[i];//通过遍历去拿每一个分类
+
+        method_list_t *mlist = entry.cat->methodsForMeta(isMeta);
+        if (mlist) {
+            mlists[mcount++] = mlist;
+            fromBundle |= entry.hi->isBundle();//将一个类的所有分类的方法存到mlist数组中；
+        }
+
+        property_list_t *proplist = 
+            entry.cat->propertiesForMeta(isMeta, entry.hi);
+        if (proplist) {
+            proplists[propcount++] = proplist;
+        }
+
+        protocol_list_t *protolist = entry.cat->protocols;
+        if (protolist) {
+            protolists[protocount++] = protolist;
+        }
+    }
+
+    auto rw = cls->data();
+
+    prepareMethodLists(cls, mlists, mcount, NO, fromBundle);
+    rw->methods.attachLists(mlists, mcount);
+    free(mlists);
+    if (flush_caches  &&  mcount > 0) flushCaches(cls);
+
+    rw->properties.attachLists(proplists, propcount);
+    free(proplists);
+
+    rw->protocols.attachLists(protolists, protocount);
+    free(protolists);
 }
 ```
 
