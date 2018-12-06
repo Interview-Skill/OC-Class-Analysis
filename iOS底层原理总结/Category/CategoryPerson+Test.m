@@ -28,4 +28,17 @@
 	return 10;
 }
 
++ (void)load
+{
+	NSLog(@"Class catetory load");
+}
+
++ (void)initialize
+{
+	//	if (self == [<#ClassName#> class]) {
+	//
+	//	}
+	NSLog(@"分类 initialize");
+}
+
 @end

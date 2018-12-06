@@ -12,6 +12,7 @@
 #import <objc/runtime.h>
 #import "Student.h"
 #import "RunLoopChildViewController.h"
+#import "CategoryStudent.h"
 
 @interface ViewController ()
 
@@ -79,7 +80,13 @@
 	Class studentMetaClass = [Student class];
 	NSLog(@"%@",stu);
 	NSLog(@"%zd,%zd", class_getInstanceSize([NSObject class]) ,class_getInstanceSize([Student class]));
+	
+	CategoryStudent *cperson = [CategoryStudent new];
+	[cperson run];
+	[self printClassMethod:[cperson class]];
 }
+
+
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
 {

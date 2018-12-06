@@ -16,6 +16,7 @@
 		482D733521B8040600A83F0A /* CategoryPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733421B8040600A83F0A /* CategoryPerson.m */; };
 		482D733821B8042C00A83F0A /* CategoryPerson+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733721B8042C00A83F0A /* CategoryPerson+Test.m */; };
 		482D733B21B8043A00A83F0A /* CategoryPerson+TestTwo.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733A21B8043A00A83F0A /* CategoryPerson+TestTwo.m */; };
+		48AA46B621B955CB00378F24 /* CategoryStudent.m in Sources */ = {isa = PBXBuildFile; fileRef = 48AA46B521B955CB00378F24 /* CategoryStudent.m */; };
 		48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA6FE21B2C18300B32374 /* AppDelegate.m */; };
 		48CDA70221B2C18300B32374 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA70121B2C18300B32374 /* ViewController.m */; };
 		48CDA70521B2C18300B32374 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48CDA70321B2C18300B32374 /* Main.storyboard */; };
@@ -226,6 +227,8 @@
 		482D733921B8043A00A83F0A /* CategoryPerson+TestTwo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CategoryPerson+TestTwo.h"; sourceTree = "<group>"; };
 		482D733A21B8043A00A83F0A /* CategoryPerson+TestTwo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CategoryPerson+TestTwo.m"; sourceTree = "<group>"; };
 		482D733C21B8070100A83F0A /* CategoryPerson+Test.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CategoryPerson+Test.cpp"; sourceTree = "<group>"; };
+		48AA46B421B955CB00378F24 /* CategoryStudent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryStudent.h; sourceTree = "<group>"; };
+		48AA46B521B955CB00378F24 /* CategoryStudent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryStudent.m; sourceTree = "<group>"; };
 		48CDA6FA21B2C18300B32374 /* iOS底层原理总结.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS底层原理总结.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CDA6FD21B2C18300B32374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48CDA6FE21B2C18300B32374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -596,6 +599,8 @@
 			children = (
 				482D733321B8040600A83F0A /* CategoryPerson.h */,
 				482D733421B8040600A83F0A /* CategoryPerson.m */,
+				48AA46B421B955CB00378F24 /* CategoryStudent.h */,
+				48AA46B521B955CB00378F24 /* CategoryStudent.m */,
 				482D733621B8042C00A83F0A /* CategoryPerson+Test.h */,
 				482D733721B8042C00A83F0A /* CategoryPerson+Test.m */,
 				482D733C21B8070100A83F0A /* CategoryPerson+Test.cpp */,
@@ -965,6 +970,7 @@
 				481E5B3C21B6D1F5004BFEA8 /* RunLoopChildViewController.m in Sources */,
 				48CDA72C21B4190300B32374 /* PersonOne.m in Sources */,
 				481E5B3921B6CB53004BFEA8 /* RunLoopView.m in Sources */,
+				48AA46B621B955CB00378F24 /* CategoryStudent.m in Sources */,
 				48CDA70221B2C18300B32374 /* ViewController.m in Sources */,
 				48CDA70D21B2C18400B32374 /* main.m in Sources */,
 				48CDA72F21B41D6A00B32374 /* StuentOne.m in Sources */,

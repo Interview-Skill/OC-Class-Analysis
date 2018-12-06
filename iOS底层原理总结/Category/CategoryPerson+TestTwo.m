@@ -15,4 +15,9 @@
 	NSLog(@"person (test2) run");
 }
 
++ (void)load
+{
+	NSLog(@"catetory person testTwo");
+}
+
 @end

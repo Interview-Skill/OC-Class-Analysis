@@ -13,4 +13,17 @@
 {
 	NSLog(@"person run");
 }
+
++ (void)load
+{
+	NSLog(@"Class Load");
+}
+
++ (void)initialize
+{
+//	if (self == [<#ClassName#> class]) {
+//
+//	}
+	NSLog(@"父类 initialize");
+}
 @end
