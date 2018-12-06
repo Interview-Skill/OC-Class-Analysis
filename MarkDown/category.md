@@ -431,6 +431,34 @@ void    *memmove(void *__dst, const void *__src, size_t __len);
 void    *memcpy(void *__dst, const void *__src, size_t __n);
 
 ```
+1. 在没有经过内存移动和copy：
+![memmove](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/array-list.png)
+
+2. 经过memmove之后，内存变化：
+```php
+// array()->lists 原来方法、属性、协议列表数组
+// addedCount 分类数组长度
+// oldCount * sizeof(array()->lists[0]) 原来数组占据的空间
+memmove(array()->lists + addedCount, array()->lists, 
+                  oldCount * sizeof(array()->lists[0]));
+
+```
+![memmove](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/array-copy.png)
+
+3. 经过memcpy方法之后，内存的变化
+```php
+// array()->lists 原来方法、属性、协议列表数组
+// addedLists 分类方法、属性、协议列表数组
+// addedCount * sizeof(array()->lists[0]) 原来数组占据的空间
+memcpy(array()->lists, addedLists, 
+               addedCount * sizeof(array()->lists[0]));
+
+```
+![memmove](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/array-move.png)
+
+
+
+
 
 
 
