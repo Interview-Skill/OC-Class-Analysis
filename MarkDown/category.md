@@ -711,9 +711,9 @@ void _class_initialize(Class cls)
         // Only __OBJC2__ adds these handlers. !__OBJC2__ has a
         // bootstrapping problem of this versus CF's call to
         // objc_exception_set_functions().
-#if __OBJC2__
+//#if __OBJC2__
         @try
-#endif
+//#endif
         {
             callInitialize(cls);
 
@@ -722,7 +722,7 @@ void _class_initialize(Class cls)
                              pthread_self(), cls->nameForLogging());
             }
         }
-#if __OBJC2__
+//#if __OBJC2__
         @catch (...) {
             if (PrintInitializing) {
                 _objc_inform("INITIALIZE: thread %p: +[%s initialize] "
@@ -732,7 +732,7 @@ void _class_initialize(Class cls)
             @throw;
         }
         @finally
-#endif
+//#endif
         {
             // Done initializing.
             lockAndFinishInitializing(cls, supercls);
@@ -776,6 +776,9 @@ void _class_initialize(Class cls)
         _objc_fatal("thread-safe class init in objc runtime is buggy!");
     }
 }
+```
+
+```php
 
 //重点是下面的触发机制：
 void callInitialize(Class cls)
@@ -808,12 +811,28 @@ void callInitialize(Class cls)
 
 
 ## 总结：
-![load-VS-initialize]()
 
+![load-VS-initialize](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/laod%2Binitlize.png)
 
+文字总结：
+Q1: Category中有load方法吗?load方法在什么时候调用？load方法能继承吗？<br>
+A: Category中也有load方法，load方法在app启动程序加载类信息的时候调用，load方法可以继承，调用子类load方法会先调用父类方法。
 
-
-
+Q2:load 和 initialize的区别，以及在Category重写时候的调用次序？<br>
+A:区别在与调用时刻和调用方式：
+1.调用方式：load直接调用函数地址；initialize是通过objc_msgSend调用；
+2.调用时机：laod是runtime在加载类信息和分类信息的时候调用，（只会调用一次）；initialize是类第一次接收到消息的时候调用，每个类只会initialize一次，但是父类的initialize可能会调用多次；
+3.调用顺序：
+   1)load:父类 -> 子类 -> 分类
+   2)initialize: 父类 -> 子类(如果有)
+   
+   
+   
+   
+*******
+> [Category-本质](https://www.jianshu.com/p/fa66c8be42a2)<br>
+> [Category的本质<二>load，initialize方法](http://www.cocoachina.com/ios/20180727/24346.html)<br>
+> [Category的本质<一>](https://www.jianshu.com/p/da463f413de7)<br>
 
 
 
