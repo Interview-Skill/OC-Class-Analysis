@@ -13,6 +13,9 @@
 		481E5A8A21B61BEA004BFEA8 /* OC-Class.md in Resources */ = {isa = PBXBuildFile; fileRef = 481E5A8721B61BEA004BFEA8 /* OC-Class.md */; };
 		481E5B3921B6CB53004BFEA8 /* RunLoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = 481E5B3821B6CB53004BFEA8 /* RunLoopView.m */; };
 		481E5B3C21B6D1F5004BFEA8 /* RunLoopChildViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 481E5B3B21B6D1F5004BFEA8 /* RunLoopChildViewController.m */; };
+		482D733521B8040600A83F0A /* CategoryPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733421B8040600A83F0A /* CategoryPerson.m */; };
+		482D733821B8042C00A83F0A /* CategoryPerson+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733721B8042C00A83F0A /* CategoryPerson+Test.m */; };
+		482D733B21B8043A00A83F0A /* CategoryPerson+TestTwo.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733A21B8043A00A83F0A /* CategoryPerson+TestTwo.m */; };
 		48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA6FE21B2C18300B32374 /* AppDelegate.m */; };
 		48CDA70221B2C18300B32374 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA70121B2C18300B32374 /* ViewController.m */; };
 		48CDA70521B2C18300B32374 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48CDA70321B2C18300B32374 /* Main.storyboard */; };
@@ -216,6 +219,13 @@
 		481E5B3B21B6D1F5004BFEA8 /* RunLoopChildViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunLoopChildViewController.m; sourceTree = "<group>"; };
 		481E5B3D21B79858004BFEA8 /* category.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = category.md; sourceTree = "<group>"; };
 		481E5B3E21B79858004BFEA8 /* runloop.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = runloop.md; sourceTree = "<group>"; };
+		482D733321B8040600A83F0A /* CategoryPerson.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryPerson.h; sourceTree = "<group>"; };
+		482D733421B8040600A83F0A /* CategoryPerson.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryPerson.m; sourceTree = "<group>"; };
+		482D733621B8042C00A83F0A /* CategoryPerson+Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CategoryPerson+Test.h"; sourceTree = "<group>"; };
+		482D733721B8042C00A83F0A /* CategoryPerson+Test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CategoryPerson+Test.m"; sourceTree = "<group>"; };
+		482D733921B8043A00A83F0A /* CategoryPerson+TestTwo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CategoryPerson+TestTwo.h"; sourceTree = "<group>"; };
+		482D733A21B8043A00A83F0A /* CategoryPerson+TestTwo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "CategoryPerson+TestTwo.m"; sourceTree = "<group>"; };
+		482D733C21B8070100A83F0A /* CategoryPerson+Test.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CategoryPerson+Test.cpp"; sourceTree = "<group>"; };
 		48CDA6FA21B2C18300B32374 /* iOS底层原理总结.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS底层原理总结.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CDA6FD21B2C18300B32374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48CDA6FE21B2C18300B32374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -581,6 +591,20 @@
 			path = Examples;
 			sourceTree = "<group>";
 		};
+		482D733021B803EC00A83F0A /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				482D733321B8040600A83F0A /* CategoryPerson.h */,
+				482D733421B8040600A83F0A /* CategoryPerson.m */,
+				482D733621B8042C00A83F0A /* CategoryPerson+Test.h */,
+				482D733721B8042C00A83F0A /* CategoryPerson+Test.m */,
+				482D733C21B8070100A83F0A /* CategoryPerson+Test.cpp */,
+				482D733921B8043A00A83F0A /* CategoryPerson+TestTwo.h */,
+				482D733A21B8043A00A83F0A /* CategoryPerson+TestTwo.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
 		48CDA6F121B2C18300B32374 = {
 			isa = PBXGroup;
 			children = (
@@ -602,6 +626,7 @@
 		48CDA6FC21B2C18300B32374 /* iOS底层原理总结 */ = {
 			isa = PBXGroup;
 			children = (
+				482D733021B803EC00A83F0A /* Category */,
 				481E5A9121B6B76F004BFEA8 /* CFRunLoopRef-855.17 */,
 				481E5A8421B61BEA004BFEA8 /* MarkDown */,
 				48CDA7EF21B4362000B32374 /* objc-RunTime4-723 */,
@@ -934,6 +959,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				482D733821B8042C00A83F0A /* CategoryPerson+Test.m in Sources */,
+				482D733B21B8043A00A83F0A /* CategoryPerson+TestTwo.m in Sources */,
 				481E5A8221B61623004BFEA8 /* KVOPerson.m in Sources */,
 				481E5B3C21B6D1F5004BFEA8 /* RunLoopChildViewController.m in Sources */,
 				48CDA72C21B4190300B32374 /* PersonOne.m in Sources */,
@@ -942,6 +969,7 @@
 				48CDA70D21B2C18400B32374 /* main.m in Sources */,
 				48CDA72F21B41D6A00B32374 /* StuentOne.m in Sources */,
 				48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */,
+				482D733521B8040600A83F0A /* CategoryPerson.m in Sources */,
 				48CDA72721B3648D00B32374 /* Student.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
