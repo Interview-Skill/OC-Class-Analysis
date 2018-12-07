@@ -65,7 +65,7 @@ void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__createBlock_block_im
 ### 2.__HaviBlock__createBlock_block_impl_0函数内部结构体：
 
 ```php
-struct __HaviBlock__createBlock_block_im
+struct __HaviBlock__createBlock_block_impl_0
 
 {
   struct __block_impl impl;
@@ -134,7 +134,86 @@ void(^block)(int ,int) = ^(int a, int b){
 ```
 A:因为在block定义的时候，已经将age的值传入__HaviBlock__createBlock_block_impl_0结构体中，并在调用的时候讲age从block中取出来使用，因此在block定义之后对局部变量进行改变无法被block捕获的。
 
+## 重新探究__HaviBlock__createBlock_block_impl_0结构体
+```php
+struct __HaviBlock__createBlock_block_impl_0 {
+  struct __block_impl impl;
+  struct __HaviBlock__createBlock_block_desc_0* Desc;
+  __Block_byref_age_0 *age; // by ref
+  __HaviBlock__createBlock_block_impl_0(void *fp, struct __HaviBlock__createBlock_block_desc_0 *desc, __Block_byref_age_0 *_age, int flags=0) : age(_age->__forwarding) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+```
+__HaviBlock__createBlock_block_impl_0第一个变量就是__block_impl结构体：
 
+```php
+struct __block_impl {
+  void *isa;
+  int Flags;
+  int Reserved;
+  void *FuncPtr;
+};
+```
+
+从这里__HaviBlock__createBlock_block_impl_0内部有一个isa指针，因此说明block本质上是一个OC对象。而在
+__HaviBlock__createBlock_block_impl_0 构造函数中传入的值存储在__HaviBlock__createBlock_block_impl_0结构体中，最后将改结构体的地址赋值给block。
+
+### 根据__HaviBlock__createBlock_block_impl_0三个参数的分析得出结论：<br>
+1. __block_impl结构体中的指针存储着&_NSConcreteStackBlock地址，可以暂时理解为类对象地址，block就是_NSConcreteStackBlock类型的。<br>
+2. block代码中的代码被封装成为__HaviBlock__createBlock_block_func_0，FuncPtr则存储着__HaviBlock__createBlock_block_func_0的地址<br>
+3. Desc指向__HaviBlock__createBlock_block_desc_0结构体对象，其中存储着__HaviBlock__createBlock_block_impl_0结构体占用的空间；
+
+# 调用block执行内部函数：
+```php
+
+ ((void (*)(__block_impl *, int, int))((__block_impl *)block)->FuncPtr)((__block_impl *)block, 3, 5);
+
+```
+
+上面的代码可以看出block通过block找到FunPtr直接调用，通过上面的源代码我们知道block指向的是__HaviBlock__createBlock_block_impl_0类型的结构体，但是在__HaviBlock__createBlock_block_impl_0中并没有直接可以找到FunPtr，而FunPtr存储在__block_impl中，为什么block可以直接调用__block_impl中的FunPtr呢？<br>
+
+是因为（__blcok_impl*）block将block强制转化为__block_impl类型的，因为__block_impl是__HaviBlock__createBlock_block_impl_0结构体的第一个成员，也就是说__block_impl的内存地址就是__HaviBlock__createBlock_block_impl_0结构体内存地址的开发。所以可以转化成功。（why?todo）<br>
+
+FunPtr中存储着通过代码块封装的函数地址，那么调用这个函数，也就是执行代码快中的代码。回头看__HaviBlock__createBlock_block_func_0，可以发现第一个参数是_HaviBlock__createBlock_block_impl_0类型的指针，也就是说将block传入到了__HaviBlock__createBlock_block_func_0中，方便重中取出block捕获的值。
+
+# 验证Block本质确实是__HaviBlock__createBlock_block_impl_0结构体
+方法：我们使用自定义和Block一致的结构体，并将block内部的结构体强制转化为我们自定义的结构体：
+```php
+struct __main_block_desc_0 { 
+    size_t reserved;
+    size_t Block_size;
+};
+struct __block_impl {
+    void *isa;
+    int Flags;
+    int Reserved;
+    void *FuncPtr;
+};
+// 模仿系统__main_block_impl_0结构体
+struct __main_block_impl_0 { 
+    struct __block_impl impl;
+    struct __main_block_desc_0* Desc;
+    int age;
+};
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        int age = 10;
+        void(^block)(int ,int) = ^(int a, int b){
+            NSLog(@"this is block,a = %d,b = %d",a,b);
+            NSLog(@"this is block,age = %d",age);
+        };
+// 将底层的结构体强制转化为我们自己写的结构体，通过我们自定义的结构体探寻block底层结构体
+        struct __main_block_impl_0 *blockStruct = (__bridge struct __main_block_impl_0 *)block;
+        block(3,5);
+    }
+    return 0;
+}
+
+```
 
 
 
