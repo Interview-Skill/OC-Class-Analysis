@@ -65,7 +65,9 @@ void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__createBlock_block_im
 ### 2.__HaviBlock__createBlock_block_impl_0函数内部结构体：
 
 ```php
-struct __HaviBlock__createBlock_block_impl_0 {
+struct __HaviBlock__createBlock_block_im
+
+{
   struct __block_impl impl;
   struct __HaviBlock__createBlock_block_desc_0* Desc;
   int age;
@@ -82,12 +84,60 @@ __HaviBlock__createBlock_block_impl_0 结构体内有一个同名的构造函数
 也就是说最终将__HaviBlock__createBlock_block_impl_0结构体的地址赋值给了block变量！<br>
 
 __HaviBlock__createBlock_block_impl_0构造函数有四个参数：
-1. (void *)__HaviBlock__createBlock_block_func_0
-2. &__HaviBlock__createBlock_block_desc_0_DATA
-3. int _age,
-4. int flags=0
-其中flag是具有默认值，这里的age则是表示传入_age参数赋值给age成员；
-接下来介绍
+1）. (void *)__HaviBlock__createBlock_block_func_0
+2）. &__HaviBlock__createBlock_block_desc_0_DATA
+3）. int _age,
+4）. int flags=0
+其中flag是具有默认值，这里的age则是表示传入_age参数赋值给age成员；<br>
+### 接下来介绍这三个参数：
+
+#### 1.__HaviBlock__createBlock_block_func_0
+```php
+static void __HaviBlock__createBlock_block_func_0(struct __HaviBlock__createBlock_block_impl_0 *__cself, int a, int b) {
+  int age = __cself->age; // bound by copy
+
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_1ee770_mi_0,a,b);
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_1ee770_mi_1,age );
+}
+```
+在这个函数中，首先取出age的值，紧接着可以看到两个熟悉的NSLog，这个就是我们再block中写下的代码。所以__HaviBlock__createBlock_block_func_0函数中其实保存着我们在block中写下的代码。__HaviBlock__createBlock_block_impl_0中传入的是__HaviBlock__createBlock_block_func_0，<strong> 就是说我们再block中写下的代码被封装成为__HaviBlock__createBlock_block_func_0</strong>并把__HaviBlock__createBlock_block_func_0函数的地址保存在__HaviBlock__createBlock_block_impl_0中。
+
+#### 2.__HaviBlock__createBlock_block_desc_0_DATA
+```php
+
+static struct __HaviBlock__createBlock_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __HaviBlock__createBlock_block_impl_0*, struct __HaviBlock__createBlock_block_impl_0*);
+  void (*dispose)(struct __HaviBlock__createBlock_block_impl_0*);
+} __HaviBlock__createBlock_block_desc_0_DATA = { 0, sizeof(struct __HaviBlock__createBlock_block_impl_0), __HaviBlock__createBlock_block_copy_0, __HaviBlock__createBlock_block_dispose_0};
+
+```
+__HaviBlock__createBlock_block_desc_0中存储着两个参数：reserved 和 Block_size，并且reserved赋值为0，Block_size则存储着__HaviBlock__createBlock_block_impl_0的占用空间的大小。最后将__HaviBlock__createBlock_block_desc_0地址传入__HaviBlock__createBlock_block_impl_0中的Desc.
+
+#### 3. age
+age是我们定义的局部变量。因为在block中使用age局部变量，所以在block声明的时候会将age作为参数传入，<strong>也就是说block会捕获age变量 </strong>
+如果在block中没有使用age，则只会传入__HaviBlock__createBlock_block_func_0 和__HaviBlock__createBlock_block_desc_0_DATA这两个参数。
+<br>
+##### 在这里可以思考：为什么在我们定义block之后，再改变age的值，在block调用的时候无效？
+```php
+int age = 10;
+void(^block)(int ,int) = ^(int a, int b){
+     NSLog(@"this is block,a = %d,b = %d",a,b);
+     NSLog(@"this is block,age = %d",age);
+};
+     age = 20;
+     block(3,5); 
+     // log: this is block,a = 3,b = 5
+     //      this is block,age = 10
+
+```
+A:因为在block定义的时候，已经将age的值传入__HaviBlock__createBlock_block_impl_0结构体中，并在调用的时候讲age从block中取出来使用，因此在block定义之后对局部变量进行改变无法被block捕获的。
+
+
+
+
+
 
 
 
