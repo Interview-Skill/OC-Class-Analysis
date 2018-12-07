@@ -56,5 +56,57 @@ static void _I_HaviBlock_createBlock(HaviBlock * self, SEL _cmd) {//这个就是
 }
 
 ```
+### 1.定义block变量
+```php
+void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__createBlock_block_impl_0((void *)__HaviBlock__createBlock_block_func_0, &__HaviBlock__createBlock_block_desc_0_DATA, age));
+```
+从上面的定义，block中调用了__HaviBlock__createBlock_block_impl_0函数，并且将__HaviBlock__createBlock_block_impl_0函数的地址赋值给了blcok.下面来看下__HaviBlock__createBlock_block_impl_0内部结构：
+
+### 2.__HaviBlock__createBlock_block_impl_0函数内部结构体：
+
+```php
+struct __HaviBlock__createBlock_block_impl_0 {
+  struct __block_impl impl;
+  struct __HaviBlock__createBlock_block_desc_0* Desc;
+  int age;
+  __HaviBlock__createBlock_block_impl_0(void *fp, struct __HaviBlock__createBlock_block_desc_0 *desc, int _age, int flags=0) : age(_age) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+```
+__HaviBlock__createBlock_block_impl_0 结构体内有一个同名的构造函数__HaviBlock__createBlock_block_impl_0，构造函数中对变量进行了赋值，并最终返回了一个结构体。<br>
+
+也就是说最终将__HaviBlock__createBlock_block_impl_0结构体的地址赋值给了block变量！<br>
+
+__HaviBlock__createBlock_block_impl_0构造函数有四个参数：
+1. (void *)__HaviBlock__createBlock_block_func_0
+2. &__HaviBlock__createBlock_block_desc_0_DATA
+3. int _age,
+4. int flags=0
+其中flag是具有默认值，这里的age则是表示传入_age参数赋值给age成员；
+接下来介绍
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
