@@ -25,7 +25,7 @@ xcrun -sdk iphonesimulator clang -rewrite-objc HaviBlock.m
 下面是C++结构的block：
 
 ```php
-struct __HaviBlock__createBlock_block_impl_0 {
+struct __HaviBlock__createBlock_block_impl_0 {//block的C++结构
   struct __block_impl impl;
   struct __HaviBlock__createBlock_block_desc_0* Desc;
   int age;
@@ -37,7 +37,8 @@ struct __HaviBlock__createBlock_block_impl_0 {
   }
 };
 static void __HaviBlock__createBlock_block_func_0(struct __HaviBlock__createBlock_block_impl_0 *__cself, int a, int b) {
-  int age = __cself->age; // bound by copy
+  int age = __cself->age; // bound by copy//从这里可以看到是对外面的变量copy过来的
+  __Block_byref_age_0 *age = __cself->age; // bound by ref//如果使用了__block，是对外面的变量创建了个引用
 
   NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_1ee770_mi_0,a,b);
   NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_1ee770_mi_1,age );
@@ -48,10 +49,12 @@ static struct __HaviBlock__createBlock_block_desc_0 {
   size_t Block_size;
 } __HaviBlock__createBlock_block_desc_0_DATA = { 0, sizeof(struct __HaviBlock__createBlock_block_impl_0)};
 
-static void _I_HaviBlock_createBlock(HaviBlock * self, SEL _cmd) {
+static void _I_HaviBlock_createBlock(HaviBlock * self, SEL _cmd) {//这个就是block中的create函数
  int age = 10;
  void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__createBlock_block_impl_0((void *)__HaviBlock__createBlock_block_func_0, &__HaviBlock__createBlock_block_desc_0_DATA, age));
  ((void (*)(__block_impl *, int, int))((__block_impl *)block)->FuncPtr)((__block_impl *)block, 3, 5);
 }
 
 ```
+
+
