@@ -581,6 +581,8 @@ int main(int argc, const char * argv[]) {
 
 ## ARC帮你做了什么❓
 
+‼️在ARC环境下，编译器会根据情况自动将栈上的block进行copy操作，将block复制到堆上。
+### 什么
 
 
 
