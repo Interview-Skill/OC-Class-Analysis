@@ -232,6 +232,86 @@ int main(int argc, const char * argv[]) {
 
 # Block捕获变量
 
+为了保证block能够正常访问外部变量，block有一个变量捕获机制：
+
+## 1. 局部变量
+### 1）auto变量
+上面的代码我们已经了解了block对age变量的捕获。
+auto变量离开作用域就会销毁，<strong>局部变量前面默认添加auto关键字</strong>。自定变量会捕获到block内部，也就是说在block内部会新增一个变量专门来存储变量值。auto变量只存在局部变量中，访问方式是值传递，通过对age源码的查看可以确认。
+
+### 2）static变量
+static修饰的变量为指针传递，就是说他是通过传递该值的地址到block内部，看看下源码：
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        auto int age = 10;
+        static int ageB = 11;
+        void(^block)(void) = ^{
+            NSLog(@"hello, a = %d, b = %d", age,ageB);
+        };
+        a = 1;
+        b = 2;
+        block();
+    }
+    return 0;
+}
+// log : block本质[57465:18555229] hello, a = 10, b = 2
+// block中a的值没有被改变而b的值随外部变化而变化。
+
+```
+我们经过xcrun编译为C++：
+```php
+struct __HaviNewBlock__verifyBlock_block_impl_0 {
+  struct __block_impl impl;
+  struct __HaviNewBlock__verifyBlock_block_desc_0* Desc;
+  int age;
+  int *ageB;	//这里可以看到使用static修饰的变量在编译为c++后是指针
+  __HaviNewBlock__verifyBlock_block_impl_0(void *fp, struct __HaviNewBlock__verifyBlock_block_desc_0 *desc, int _age, int *_ageB, int flags=0) : age(_age), ageB(_ageB) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+static void __HaviNewBlock__verifyBlock_block_func_0(struct __HaviNewBlock__verifyBlock_block_impl_0 *__cself, int a, int b) {
+  int age = __cself->age; // bound by copy
+  int *ageB = __cself->ageB; // bound by copy
+
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviNewBlock_49c829_mi_2,a,b);
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviNewBlock_49c829_mi_3,age );
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviNewBlock_49c829_mi_4,(*ageB));
+ }
+ 
+ 从这里我们可以看出ageB穿进去的是地址
+ void(*block)(int, int) = ((void (*)(int, int))&__HaviNewBlock__verifyBlock_block_impl_0((void *)__HaviNewBlock__verifyBlock_block_func_0, &__HaviNewBlock__verifyBlock_block_desc_0_DATA, age, &ageB));
+
+
+```
+
+从源代码中看出，age和ageB两个变量都被捕获到了block内部，但是age是通过值传递的，ageB是传递的是地址。
+为什么有这种差异？因为自动变量随时有可能被销毁，block在执行的时候有可能自动变量被销毁了，如果这个时候再去访问被销毁的地址就会找不到这个内存地址，因此自动变量一定是值传递而不是指针传递了。而静态变量是不会被销毁的，因此可以使用指针传递。因为传递的是值地址，在block调用前修改，会体现出来。
+
+## 全局变量
+我们看下全局的变量捕获情况：
+```php
+int a = 10;
+static int b = 11;
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        void(^block)(void) = ^{
+            NSLog(@"hello, a = %d, b = %d", a,b);
+        };
+        a = 1;
+        b = 2;
+        block();
+    }
+    return 0;
+}
+// log hello, a = 1, b = 2
+
+```
+我们生成c++
 
 
 
