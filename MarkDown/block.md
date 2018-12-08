@@ -312,6 +312,12 @@ int main(int argc, const char * argv[]) {
 
 ```
 我们生成c++
+![c++](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/c%2B%2B.png)
+通过上面的代码发现block_impl_0中并没有添加任何变量，因为block不需要捕获全局变量，因为全局变量在哪里都可以访问。<br>
+<strong>因为局域变量需要跨函数访问所以需要捕获，全局变量在哪里都可以访问，所以不需要捕获</strong>
+![c++](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/auto-static.png)
+
+#### 局部
 
 
 
