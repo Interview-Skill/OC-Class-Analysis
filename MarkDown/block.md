@@ -419,7 +419,7 @@ static void __BlockSelfObject__test_block_func_0(struct __BlockSelfObject__test_
  属性调用get方法，通过方法选择器获取name
  成员变量直接通过地址获取
 ```
-<strong>即使block使用的是实例对象的属性，block捕获仍然是实例对象而非属性，并通过实例对象不同方法获取属性（属性调用get方法，通过方法选择器获取name
+#### 结论：<strong>即使block使用的是实例对象的属性，block捕获仍然是实例对象而非属性，并通过实例对象不同方法获取属性（属性调用get方法，通过方法选择器获取name
  成员变量直接通过地址获取） </strong>
  
  ### block的类型
@@ -489,12 +489,41 @@ block-type:__NSGlobalBlock__----__NSMallocBlock__----__NSStackBlock__
 block在内存是如何存储的？
 ![block-memmory](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block4.png)
 
-> __NSGlobalBlock__直到程序结束后才会被收回，很少使用这样的block<br>
-> __NSStackBlokc__存放在栈中，栈中的内存是由系统自动分配和释放，在作用执行完之后会立即释放，在相同的作用域中定义并调用block似乎多次一举<br>
-> __NSMallocBlock__在平时编程中最常用的，存放在堆中的block需要程序员自己释放。
+> 1.__NSGlobalBlock__直到程序结束后才会被收回，很少使用这样的block<br>
+> 2.__NSStackBlokc__存放在栈中，栈中的内存是由系统自动分配和释放，在作用执行完之后会立即释放，在相同的作用域中定义并调用block似乎多次一举<br>
+> 3.__NSMallocBlock__在平时编程中最常用的，存放在堆中的block需要程序员自己释放。
 
 #### 3.block是如何定义其类型
 ![block-memmory](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block3.png)
+我们验证上面的结论：
+首先我们关闭ARC,因为ARC会自动帮我们进行很多处理：
+
+```php
+// MRC环境！！！
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // Global：没有访问auto变量：__NSGlobalBlock__
+        void (^block1)(void) = ^{
+            NSLog(@"block1---------");
+        };   
+        // Stack：访问了auto变量： __NSStackBlock__
+        int a = 10;
+        void (^block2)(void) = ^{
+            NSLog(@"block2---------%d", a);
+        };
+        NSLog(@"%@ %@", [block1 class], [block2 class]);
+        // __NSStackBlock__调用copy ： __NSMallocBlock__
+        NSLog(@"%@", [[block2 copy] class]);
+    }
+    return 0;
+}
+
+打印结果：
+__NSGlobalBlock__	__NSStackBlock__	__NSMallocBlock__
+
+```
+
+
 
 
 
