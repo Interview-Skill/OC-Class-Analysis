@@ -97,6 +97,20 @@ int main(int argc, const char * argv[]) {
 ```php
 xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc -fobjc-arc -fobjc-runtime=ios-8.0.0 main.m
 ```
+```php
+struct __BlockSelfObject__test_block_impl_0 {
+  struct __block_impl impl;
+  struct __BlockSelfObject__test_block_desc_0* Desc;
+  Person *__weak weakPerson; //这里添加了weak
+  __BlockSelfObject__test_block_impl_0(void *fp, struct __BlockSelfObject__test_block_desc_0 *desc, BlockSelfObject *_self, int flags=0) : self(_self) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+```
 
+__weak修饰的变量，在生成的[__BlockSelfObject__test_block_impl_0]中也会使用[__weak]
 
 
