@@ -142,9 +142,32 @@ __Block_object_assign函数。<br>
 
 ‼️__Block_object_assign函数会自动根据__main_block_impl_0结构体内部的person是什么类型的指针，对person对象产生强引用或者弱引用。可以理解为_Block_object_assign函数内部会对person进行引用计数器的操作，如果__main_block_impl_0结构体内person指针是__strong类型，则为强引用，引用计数+1，如果__main_block_impl_0结构体内person指针是__weak类型，则为弱引用，引用计数不变。
 
-#### __Block_object_dispose函数调用时机及作用
+#### __Block_object_dispose 函数调用时机及作用
 ‼️当block从堆中移除时就会自动调用__main_block_desc_0中的__main_block_dispose_0函数，__main_block_dispose_0函数内部会调用_Block_object_dispose函数。
 __Block_object_dispose会对person对象做释放操作，类似于release，也就是断开对person对象的引用，而person究竟是否被释放还是取决于person对象自己的引用计数。
+
+## 总结
+1. 一旦block捕获的变量是对象类型，block结构体中的<strong>__main_block_desc_0</strong>会多出两个参数[copy]()和[dispose]().因为访问的是个对象，block希望拥有这个对象，就需要对对象进行引用，也就是进行内存管理。比如说对对象进行retain操作，因此一旦block捕获的变量是对象类型就会自动生成copy和dispose来对内部引用的对象进行内存管理。<br>
+2. 当block内部访问了对象类型的auto变量的时候，如果block在栈上，block内部不会对person产生强引用。不论block内部的变量是__strong还是__weak修饰，都不会对变量产生引用。<br>
+3. 如果block被拷贝到堆上。copy函数会调用__Block_object_assign函数，根据auto变量的修饰符(__strong,__weak,unsafe_unretained)做出相应的操作，行程强引用或者弱引用。<br>
+4. 如果block从堆中移除，dispose函数会调用__Block_object_dispose函数，自动释放引用的auto变量。
+
+****
+
+## 问题
+
+### 1.下面的Person在何时销毁？
+```php
+PersonOne *p = [PersonOne new];
+dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    NSLog(@"p");
+});
+
+结果是在block执行完后person销毁
+```
+答：上面的代码在ARC环境中，Block作为GCD API的参数时会自动进行copy操作，因此block在堆空间，并且使用强引用访问person，因此block内部copy函数对person进行强引用，当block执行完后需要被销毁，调用dispose函数释放对person的引用，person没有强指针之后被销毁。
+
+##
 
 
 
