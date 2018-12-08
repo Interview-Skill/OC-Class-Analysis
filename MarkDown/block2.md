@@ -167,7 +167,45 @@ dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), di
 ```
 答：上面的代码在ARC环境中，Block作为GCD API的参数时会自动进行copy操作，因此block在堆空间，并且使用强引用访问person，因此block内部copy函数对person进行强引用，当block执行完后需要被销毁，调用dispose函数释放对person的引用，person没有强指针之后被销毁。
 
-##
+## 2. 下面的Person在何时销毁？
+```php
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    Person *person = [[Person alloc] init];
+    
+    __weak Person *waekP = person;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSLog(@"%@",waekP);
+    });
+    NSLog(@"touchBegin----------End");
+}
+
+Person 先销毁再执行block，为null
+
+```
+
+答：block对weakP为__weak弱引用，因此block内部copy函数对person同样进行的也是弱引用，当大括号执行结束时，person对象没有强指针引用被释放掉。因此block执行的时候打印为null
+
+## 3. 再看下面的例子：
+```php
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    Person *person = [[Person alloc] init];
+    
+    __weak Person *waekP = person;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+        NSLog(@"weakP ----- %@",waekP);
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSLog(@"person ----- %@",person);
+        });
+    });
+    NSLog(@"touchBegin----------End");
+}
+```
+> 
+
 
 
 
