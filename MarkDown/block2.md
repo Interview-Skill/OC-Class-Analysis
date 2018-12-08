@@ -111,6 +111,43 @@ struct __BlockSelfObject__test_block_impl_0 {
 };
 ```
 
-__weak修饰的变量，在生成的[__BlockSelfObject__test_block_impl_0]中也会使用[__weak]
+__weak修饰的变量，在生成的[__BlockSelfObject__test_block_impl_0]()中也会使用[__weak]()
+
+#### __BlockSelfObject__test_block_copy_0 和 __BlockSelfObject__test_block_dispose_0
+
+当block中捕获对象类型的时候，block结构体__BlockSelfObject__test_block_impl_0的描述结构体 __BlockSelfObject__test_block_desc_0多了两个参数 [copy]() 和[dispose]().
+
+```php
+static void __BlockSelfObject__test_block_copy_0(struct __BlockSelfObject__test_block_impl_0*dst, struct __BlockSelfObject__test_block_impl_0*src) {_Block_object_assign((void*)&dst->self, (void*)src->self, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static void __BlockSelfObject__test_block_dispose_0(struct __BlockSelfObject__test_block_impl_0*src) {_Block_object_dispose((void*)src->self, 3/*BLOCK_FIELD_IS_OBJECT*/);}
+
+static struct __BlockSelfObject__test_block_desc_0 {
+  size_t reserved;
+  size_t Block_size;
+  void (*copy)(struct __BlockSelfObject__test_block_impl_0*, struct __BlockSelfObject__test_block_impl_0*);
+  void (*dispose)(struct __BlockSelfObject__test_block_impl_0*);
+} __BlockSelfObject__test_block_desc_0_DATA = { 0, sizeof(struct __BlockSelfObject__test_block_impl_0), __BlockSelfObject__test_block_copy_0, __BlockSelfObject__test_block_dispose_0};
+
+```
+[copy]()和[dispose]()函数传入的都是__BlockSelfObject__test_block_impl_0本身。
+
+> copy本质就是 __main_block_copy_0 函数，__main_block_copy_0 函数内部调用 __Block_object_assign 函数，__Block_object_assign 中传入的是person对象的地址，person对象，以及8。<br>
+> dispose本质就是__main_block_dispose_0函数，__main_block_dispose_0函数内部调用_Block_object_dispose函数，_Block_object_dispose函数传入的参数是person对象，以及8。
+
+#### __Block_object_assign 函数的调用时机及作用
+
+当block进行copy操作的时候会自动调用 __BlockSelfObject__test_block_desc_0内部的__main_block_copy_0，__main_block_copy_0函数内部会调用
+__Block_object_assign函数。<br>
+
+‼️__Block_object_assign函数会自动根据__main_block_impl_0结构体内部的person是什么类型的指针，对person对象产生强引用或者弱引用。可以理解为_Block_object_assign函数内部会对person进行引用计数器的操作，如果__main_block_impl_0结构体内person指针是__strong类型，则为强引用，引用计数+1，如果__main_block_impl_0结构体内person指针是__weak类型，则为弱引用，引用计数不变。
+
+#### __Block_object_dispose函数调用时机及作用
+‼️当block从堆中移除时就会自动调用__main_block_desc_0中的__main_block_dispose_0函数，__main_block_dispose_0函数内部会调用_Block_object_dispose函数。
+__Block_object_dispose会对person对象做释放操作，类似于release，也就是断开对person对象的引用，而person究竟是否被释放还是取决于person对象自己的引用计数。
+
+
+
+
 
 
