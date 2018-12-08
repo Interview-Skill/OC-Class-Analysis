@@ -4,7 +4,7 @@
 3. block的属性修饰词为什么是copy？使用block有哪些使用注意？
 4. block在修改NSMutableArray，需不需要使用__blcok?
 
-> 首先：block本质也是一个OC对象，内部也有一个isa指针。block是封装了函数调用以及函数调用环境的OC对象。
+> 首先：⚠️block本质也是一个OC对象，内部也有一个isa指针。block是封装了函数调用以及函数调用环境的OC对象。
 
 ## 探寻block的本质
 ```php
@@ -317,7 +317,7 @@ int main(int argc, const char * argv[]) {
 <strong>因为局域变量需要跨函数访问所以需要捕获，全局变量在哪里都可以访问，所以不需要捕获</strong>
 ![c++](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/auto-static.png)
 
-#### 局部变量都会被block捕获，自动变量是值捕获，静态变量为地址捕获。全局变量不会被捕获。
+#### ⚠️局部变量都会被block捕获，自动变量是值捕获，静态变量为地址捕获。全局变量不会被捕获。
 
 ### 附加题：下面的block是否会捕获变量呢？
 
@@ -381,7 +381,7 @@ static void _C_BlockSelfObject_test2(Class self, SEL _cmd) {
 }
 
 ```
-#### 不论是对象方法还是类方法self都作为参数传递给方法内部，既然作为参数传入，那么self就是是局部变量。下面看看在block中使用成员变量和属性有什么不同？
+#### ⚠️不论是对象方法还是类方法self都作为参数传递给方法内部，既然作为参数传入，那么self就是是局部变量。下面看看在block中使用成员变量和属性有什么不同？
 ```php
 
 - (void)test
@@ -419,8 +419,7 @@ static void __BlockSelfObject__test_block_func_0(struct __BlockSelfObject__test_
  属性调用get方法，通过方法选择器获取name
  成员变量直接通过地址获取
 ```
-#### 结论：<strong>即使block使用的是实例对象的属性，block捕获仍然是实例对象而非属性，并通过实例对象不同方法获取属性（属性调用get方法，通过方法选择器获取name
- 成员变量直接通过地址获取） </strong>
+#### ⚠️结论：<strong>即使block使用的是实例对象的属性，block捕获仍然是实例对象而非属性，并通过实例对象不同方法获取属性（属性调用get方法，通过方法选择器获取name，成员变量直接通过地址获取） </strong>
  
  ### block的类型
  
@@ -578,7 +577,7 @@ int main(int argc, const char * argv[]) {
 ```
 其他类型的block调用copy会有什么结果呢？
 ![stack](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block6.png)
-> 因此在MRC开始时期，我们经常使用copy来保存block，将栈上的block复制到堆中，即使栈中的block销毁，堆上的block也不会销毁，需要我们自己销毁,<strong>但是在ARC环境下，xcode会自动给我们进行copy操作，使得block不会被销毁。
+>⚠️ 因此在MRC开始时期，我们经常使用copy来保存block，将栈上的block复制到堆中，即使栈中的block销毁，堆上的block也不会销毁，需要我们自己销毁,<strong>但是在ARC环境下，xcode会自动给我们进行copy操作，使得block不会被销毁。
 
 ## ARC帮你做了什么❓
 
