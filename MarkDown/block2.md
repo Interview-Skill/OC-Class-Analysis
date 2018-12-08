@@ -92,7 +92,8 @@ int main(int argc, const char * argv[]) {
 
 ```
 下面来看编译成C++之后weak带来的变化：<br>
-> __weak 修饰变量，需要告知编译器使用ARC环境及版本会报错，添加<strong>-fobjc-arc -fobjc-runtime=ios-8.0.0</strong>
+> __weak 修饰变量，需要告知编译器使用ARC环境及版本会报错，添加<font color=#0099ff size=12 face="黑体">-fobjc-arc -fobjc-runtime=ios-8.0.0</font>
+
 ```php
 xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc -fobjc-arc -fobjc-runtime=ios-8.0.0 main.m
 ```
