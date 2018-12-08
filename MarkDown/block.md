@@ -221,7 +221,7 @@ int main(int argc, const char * argv[]) {
 ![duan](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block5.png)
 
 # 总结：到这里我们从源码查看了所有和block有关的结构体，下面通过一张图解释各个结构体的关系：
-![duan](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block1.png)
+![duan](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block.png)
 
 
 
