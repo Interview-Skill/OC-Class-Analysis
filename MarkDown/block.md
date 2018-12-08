@@ -612,8 +612,80 @@ int main(int argc, const char * argv[]) {
 ```php
 block -- type: __NSMallocBlock__
 ```
-1. 上面提到，如果block访问auto变量，block的类型为 __NSStackBlock__，但是上面的block为 __NSMallocBlock__类型，并且可以打印出变量a的值，这说明了block并没有被销毁。<br>
-2. 
+1). 上面提到，如果block访问auto变量，block的类型为 __NSStackBlock__，但是上面的block为 __NSMallocBlock__类型，并且可以打印出变量a的值，这说明了block并没有被销毁。<br>
+2). block是经过copy操作可以变为__NSMallocBlock__类型,因此可以猜测ARC自动将我们的block进行copy操作，来保存block，并在适当的地方release.
+
+### 2.将block赋值给__strong指针
+
+block赋值强指针引用的时候，ARC也会自动对block进行一次copy操作。
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // block内没有访问auto变量
+        Block block = ^{
+            NSLog(@"block---------");
+        };
+        NSLog(@"%@",[block class]);
+        int a = 10;
+        // block内访问了auto变量，但没有赋值给__strong指针
+        NSLog(@"%@",[^{
+            NSLog(@"block1---------%d", a);
+        } class]);
+        // block赋值给__strong指针
+        Block block2 = ^{
+          NSLog(@"block2---------%d", a);
+        };
+        NSLog(@"%@",[block1 class]);
+    }
+    return 0;
+}
+
+```
+打印结果：
+```php
+__NSGlobalBlock__
+__NSStackBlock__
+__NSMallocBlock__
+```
+
+### 3.block作为Cocoa API中的方法中含有usingBlock的时候
+例如：遍历函数：
+```php
+NSArray *array = @[];
+[array enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            
+}];
+```
+
+### 4.block作为GCD API的参数的时候
+比如GCD延时操作：
+```php
+
+static dispatch_once_t onceToken;
+dispatch_once(&onceToken, ^{
+            
+});        
+dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+});
+
+```
+
+### 5.block声明写法：
+1. MRC环境下：
+```php
+@property (nonmatic, copy) void (^block)(void);
+```
+2. ARC环境下：
+```php
+@property (nonmatic, copy) void (^block)(void);
+@property (nonmatic, strong) void (^block)(void);
+```
+
+*****
+
+> [探寻block的本质](https://www.jianshu.com/p/c99f4974ddb5)
+
 
 
 
