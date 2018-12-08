@@ -13,6 +13,7 @@
 #import "Student.h"
 #import "RunLoopChildViewController.h"
 #import "CategoryStudent.h"
+#import "HaviBlock.h"
 
 @interface ViewController ()
 
@@ -84,6 +85,8 @@
 	CategoryStudent *cperson = [CategoryStudent new];
 	[cperson run];
 	[self printClassMethod:[cperson class]];
+	
+	HaviBlock *block = [[HaviBlock alloc] init];
 }
 
 
