@@ -582,11 +582,38 @@ int main(int argc, const char * argv[]) {
 ## ARC帮你做了什么❓
 
 ‼️在ARC环境下，编译器会根据情况自动将栈上的block进行copy操作，将block复制到堆上。
-### 什么
+### 什么情况下ARC会自动的进行copy操作？
+以下代码是在ARC下进行的：
+### 1.block作为函数返回值
 
+```php
+typedef void (^Block)(void);
+Block myblock()
+{
+    int a = 10;
+    // 上文提到过，block中访问了auto变量，此时block类型应为__NSStackBlock__
+    Block block = ^{
+        NSLog(@"---------%d", a);
+    };
+    return block;
+}
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Block block = myblock();
+        block();
+       // 打印block类型为 __NSMallocBlock__
+        NSLog(@"%@",[block class]);
+    }
+    return 0;
+}
 
-
-
+```
+输出结果：
+```php
+block -- type: __NSMallocBlock__
+```
+1. 上面提到，如果block访问auto变量，block的类型为 __NSStackBlock__，但是上面的block为 __NSMallocBlock__类型，并且可以打印出变量a的值，这说明了block并没有被销毁。<br>
+2. 
 
 
 
