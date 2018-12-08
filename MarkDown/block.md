@@ -349,7 +349,155 @@ int main(int argc, const char * argv[]) {
 
 查看C++代码
 
-```p
+```php
+struct __BlockSelfObject__test_block_impl_0 {
+  struct __block_impl impl;
+  struct __BlockSelfObject__test_block_desc_0* Desc;
+  BlockSelfObject *self;	//self变量被捕获
+  __BlockSelfObject__test_block_impl_0(void *fp, struct __BlockSelfObject__test_block_desc_0 *desc, BlockSelfObject *_self, int flags=0) : self(_self) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+static void __BlockSelfObject__test_block_func_0(struct __BlockSelfObject__test_block_impl_0 *__cself) {
+  BlockSelfObject *self = __cself->self; // bound by copy //从block中取出self
+
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_BlockSelfObject_2ee577_mi_0,self);
+ }
+ 
+ //默认情况下，方法传入两个参数cmd和self
+ static void _I_BlockSelfObject_test(BlockSelfObject * self, SEL _cmd) {
+ void(*block)(void) = ((void (*)())&__BlockSelfObject__test_block_impl_0((void *)__BlockSelfObject__test_block_func_0, &__BlockSelfObject__test_block_desc_0_DATA, self, 570425344));
+ ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+}
+```
+从源码我们可以看到self同样被block捕获，同时我们看到test方法默认传递了两个参数cmd 和 self，而类方法也传递了两个参数cmd 和self。
+```php
+static void _C_BlockSelfObject_test2(Class self, SEL _cmd) {
+ NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_BlockSelfObject_5c7c2d_mi_1);
+}
+
+```
+#### 不论是对象方法还是类方法self都作为参数传递给方法内部，既然作为参数传入，那么self就是是局部变量。下面看看在block中使用成员变量和属性有什么不同？
+```php
+
+- (void)test
+{
+	void(^block)(void) = ^{
+		NSLog(@"%@",self);
+		NSLog(@"%@",self.name);
+		NSLog(@"%@",_name);
+	};
+	block();
+}
+```
+
+```php
+struct __BlockSelfObject__test_block_impl_0 {
+  struct __block_impl impl;
+  struct __BlockSelfObject__test_block_desc_0* Desc;
+  BlockSelfObject *self; //同样只捕获了self变量
+  __BlockSelfObject__test_block_impl_0(void *fp, struct __BlockSelfObject__test_block_desc_0 *desc, BlockSelfObject *_self, int flags=0) : self(_self) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+static void __BlockSelfObject__test_block_func_0(struct __BlockSelfObject__test_block_impl_0 *__cself) {
+  BlockSelfObject *self = __cself->self; // bound by copy
+
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_BlockSelfObject_a22808_mi_0,self);
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_BlockSelfObject_a22808_mi_1,((NSString *(*)(id, SEL))(void *)objc_msgSend)((id)self, sel_registerName("name")));
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_BlockSelfObject_a22808_mi_2,(*(NSString * _Nonnull *)((char *)self + OBJC_IVAR_$_BlockSelfObject$_name)));
+ }
+ 
+ 属性调用get方法，通过方法选择器获取name
+ 成员变量直接通过地址获取
+```
+<strong>即使block使用的是实例对象的属性，block捕获仍然是实例对象而非属性，并通过实例对象不同方法获取属性（属性调用get方法，通过方法选择器获取name
+ 成员变量直接通过地址获取） </strong>
+ 
+ ### block的类型
+ 
+ block是什么类型？在前面的源代码里看到isa指向了_NSConcreateStackBlock对象，那么block是不是就是_NSConcreateStackBlock类型？？？
+ ```php
+ int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        // __NSGlobalBlock__ : __NSGlobalBlock : NSBlock : NSObject
+        void (^block)(void) = ^{
+            NSLog(@"Hello");
+        };
+        
+        NSLog(@"%@", [block class]);
+        NSLog(@"%@", [[block class] superclass]);
+        NSLog(@"%@", [[[block class] superclass] superclass]);
+        NSLog(@"%@", [[[[block class] superclass] superclass] superclass]);
+    }
+    return 0;
+}
+```
+打印结果：
+```php
+2018-12-08 18:30:03.304124+0800 iOS底层原理总结[56926:5718709] block -------__NSMallocBlock__
+2018-12-08 18:30:03.304246+0800 iOS底层原理总结[56926:5718709] block -------__NSGlobalBlock
+2018-12-08 18:30:03.304333+0800 iOS底层原理总结[56926:5718709] block -------NSBlock
+2018-12-08 18:30:03.304401+0800 iOS底层原理总结[56926:5718709] block -------NSObject
+
+```
+
+从上面我们可以看到block都继承自NSBlock->NSObject:这也更加的验证了block是个对象
+
+#### 1. block有三种类型：
+```php
+__NSGlobalBlock__ （ _NSConcreteGlobalBlock ）
+__NSStackBlock__ （ _NSConcreteStackBlock ）
+__NSMallocBlock__ （ _NSConcreteMallocBlock ）
+```
+我们通过代码验证这三种类型的不同：
+```php
+
+- (void)blockType
+{
+	//1.内部没有调用外部任何变量的block
+	void (^block1)(void) = ^{
+		NSLog(@"hello");
+	};
+	
+	//2.调用外部变量的block
+	int a = 10;
+	void (^block2)(void) = ^{
+		NSLog(@"hello---%d",a);
+	};
+	
+	//3.直接调用block
+	
+	NSLog(@"block-type:%@----%@----%@",[block1 class],[block2 class],[^{NSLog(@"%d",a);} class]);
+}
+
+2018-12-08 18:39:52.097893+0800 iOS底层原理总结[59479:5737537] 
+block-type:__NSGlobalBlock__----__NSMallocBlock__----__NSStackBlock__
+
+```
+打印出来的类型和我们在源码中观察到的不一样？为什么：
+
+#### 2.block在内存中的存储
+block在内存是如何存储的？
+![block-memmory](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block4.png)
+
+> __NSGlobalBlock__直到程序结束后才会被收回，很少使用这样的block<br>
+> __NSStackBlokc__存放在栈中，栈中的内存是由系统自动分配和释放，在作用执行完之后会立即释放，在相同的作用域中定义并调用block似乎多次一举<br>
+> __NSMallocBlock__在平时编程中最常用的，存放在堆中的block需要程序员自己释放。
+
+#### 3.block是如何定义其类型
+![block-memmory](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block3.png)
+
+
+
 
 
 
