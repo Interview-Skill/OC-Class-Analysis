@@ -1,7 +1,7 @@
 ## OC代码转化为C++:
 - clang -rewrite-objc main.m -o main.cpp // 这种方式没有指定架构例如arm64架构 其中cpp代表（c plus plus）生成 main.cpp
 - 如果你直接使用会报错;请使用：xcrun -sdk iphonesimulator clang -rewrite-objc main.m
-  - 将此命令设置为zsh常用命令：[详情](https://www.jianshu.com/p/bd6a94d8e49b)
+- 将此命令设置为zsh常用命令：[详情](https://www.jianshu.com/p/bd6a94d8e49b)
 
 ## OC NSObject对象内部是如何布局的
 - OC对象编译成C++代码
@@ -44,7 +44,7 @@
   ```
 - Student自定义对象占用的内存空间是ISA(8) + _no(4) + _age(4) + address（8） + _name（8） = 32
 
-#### 总结：一个NSObjec对象所占用的内存是8个字节
+#### 总结：‼️一个NSObjec对象所占用的内存是8个字节
 
 ***
 
@@ -67,7 +67,7 @@
   ```
 ![debug-one](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/1434508-0f4104937adf7401.png)
 
-> 我们可以总结内存对齐为两个原则：<br>
+> ‼️我们可以总结内存对齐为两个原则：<br>
 原则 1. 前面的地址必须是后面的地址正数倍,不是就补齐。<br>
 原则 2. 整个Struct的地址必须是最大字节的整数倍。<br>
 
@@ -130,7 +130,7 @@
     }
   ```
     
- #### OC的对象类型：
+ #### ‼️OC的对象类型：
   - instance 对象（实力对象），如：Person *person
   - class对象（类对象），
   - meta-class对象（元类对象）；
@@ -147,7 +147,7 @@
       NSLog(@"is meta-class");
     }
   ```
-#### instance对象不唯一性；class对象和meta-class唯一性
+#### ‼️instance对象不唯一性；class对象和meta-class唯一性
   1. instance对象就是通过类alloc出来的对象，每次调用alloc都会产生新的instance对象；
   ```php
     NSObjcet *object1 = [[NSObjcet alloc] init];
@@ -174,7 +174,7 @@
     0x10e050ee8 0x10e050f38
   ```
  
-#### instance/class/meta-class对象存放的信息
+#### ‼️instance/class/meta-class对象存放的信息
   1. instance对象在内存中存储的信息包括
     - isa指针
     - 其成员变量
@@ -259,7 +259,7 @@
 ```
 > 当Student的class要调用Person的类方法时，会先通过isa找到Student的meta-class，然后通过superclass找到Person的meta-class，最后找到类方法的实现进行调用
 
-### 对isa、superclass总结
+### ‼️对isa、superclass总结
 
 > 1.instance的isa指向class <br>
 > 2.class的isa指向meta-class<br>
