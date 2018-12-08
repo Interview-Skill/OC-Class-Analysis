@@ -522,6 +522,66 @@ int main(int argc, const char * argv[]) {
 __NSGlobalBlock__	__NSStackBlock__	__NSMallocBlock__
 
 ```
+#### 解释：<br>
+1. 没有访问auto变量的block是 __NSGlobalBlock__ 类型的，存放在数据段中。访问了 auto变量的block是 __NSStackBlock__ 存放在栈中（因为出了作用域就会销毁，block也是一个对象）。__NSStackBlock__ 进行copy之后变成了 __NSMallocBlock__ 类型，并被copy到了堆中。<br>
+2. __NSGlobalBlock__ 类型的很少见，因为如果block不访问外界变量，直接通过函数实现就可以了，不需要block了。<br>
+3. __NSStackBlock__ 访问了外部变量，并且存放在栈中，栈里面的代码在作用域结束后就会被销毁，那么就有可能在block内存销毁之后采取调用它，这样就会有问题。<br>
+
+看下面的例子：
+```php
+void (^block)(void);
+void test()
+{
+    // __NSStackBlock__
+    int a = 10;
+    block = ^{
+        NSLog(@"block---------%d", a);
+    };
+}
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        test();
+        block();
+    }
+    return 0;
+}
+
+打印结果：block----------272632488找不到了
+
+```
+
+看到a时一个不可控的值，是因为创建的block是 __NSStackBlock__ (自己思考为什么)因此block是存在栈中的，当test函数执行完之后，栈内存中的block占用的内存会被收回，因此就找不到数据a了；
+
+![stack](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/nsstackblock.png)
+
+为了避免这种情况发生，需要将block复制到堆中：
+```php
+
+void (^block)(void);
+void test()
+{
+    // __NSStackBlock__
+    int a = 10;
+    block = ^{
+        NSLog(@"block---------%d", a);
+    };
+}
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        test();
+        block();
+    }
+    return 0;
+}
+
+打印结果：block----------10
+```
+其他类型的block调用copy会有什么结果呢？
+![stack](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block6.png)
+> 因此在MRC开始时期，我们经常使用copy来保存block，将栈上的block复制到堆中，即使栈中的block销毁，堆上的block也不会销毁，需要我们自己销毁,<strong>但是在ARC环境下，xcode会自动给我们进行copy操作，使得block不会被销毁。
+
+## ARC帮你做了什么❓
+
 
 
 
