@@ -204,7 +204,51 @@ Person 先销毁再执行block，为null
     NSLog(@"touchBegin----------End");
 }
 ```
-> 
+> 2018-12-10 -------- touchBegin----------End<br>
+2018-12-10 weakP -------<Person: 0x60800006050><br>
+2018-12-10 person -------<Person: 0x60800006050><br>
+2018-12-10 person 对象销毁了<br>
+
+原因是person被强引用了，不会被立刻销毁。
+
+## 4.再看下面的例子：
+```php
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    Person *person = [[Person alloc] init];
+    
+    __weak Person *waekP = person;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+        NSLog(@"person ----- %@",person);
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSLog(@"weakP ----- %@",waekP);
+        });
+    });
+    NSLog(@"touchBegin----------End");
+}
+
+```
+> 2018-12-10 -------- touchBegin----------End<br>
+2018-12-10 person -------<Person: 0x60800006050><br>
+2018-12-10 person 对象销毁了<br>
+2018-12-10 weakP ------null
+因为在第一个gcd结束后person就释放了。
+
+****
+
+## block修改变量的值
+
+
+
+
+
+
+
+
+
+
 
 
 
