@@ -317,8 +317,39 @@ int main(int argc, const char * argv[]) {
 <strong>因为局域变量需要跨函数访问所以需要捕获，全局变量在哪里都可以访问，所以不需要捕获</strong>
 ![c++](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/auto-static.png)
 
-#### 局部
+#### 局部变量都会被block捕获，自动变量是值捕获，静态变量为地址捕获。全局变量不会被捕获。
 
+### 附加题：下面的block是否会捕获变量呢？
+
+```php
+
+#import "Person.h"
+@implementation Person
+- (void)test
+{
+    void(^block)(void) = ^{
+        NSLog(@"%@",self);
+    };
+    block();
+}
+- (instancetype)initWithName:(NSString *)name
+{
+    if (self = [super init]) {
+        self.name = name;
+    }
+    return self;
+}
++ (void) test2
+{
+    NSLog(@"类方法test2");
+}
+@end
+
+```
+
+查看C++代码
+
+```p
 
 
 
