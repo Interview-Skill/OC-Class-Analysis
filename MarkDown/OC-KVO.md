@@ -62,7 +62,7 @@ NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector
 ```
 所以我们可以推测Foundation框架中还有很多例如_NSSetBoolValueAndNotify、_NSSetCharValueAndNotify、_NSSetFloatValueAndNotify、_NSSetLongValueAndNotify等等函数；
 
-### NSKVONotifyin_Person内部结构
+### ‼️NSKVONotifyin_Person内部结构
 1.NSKVONotifyin_Person作为Person的子类，其superclass指针指向Person类，
 2.NSKVONotifyin_Person内部一定对setAge方法做了单独的实现，那么NSKVONotifyin_Person同Person类的差别可能就在于其内存储的对象方法及实现不同。
 通过runtime分别打印Person类对象和NSKVONotifyin_Person类对象内存储的对象方法
@@ -113,8 +113,8 @@ NSLog(@"添加KVO监听之后 - p1 = %p, p2 = %p", [kvoPerson1 methodForSelector
 
 添加KVO之后isa指针的指向：
 ![use-kvo](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/kvo-setage.png)
-1. 重写了setAge方法
-2. 重写了class方法
+‼️1. 重写了setAge方法
+‼️2. 重写了class方法
 NSKVONotifyin_Person重写class方法是为了隐藏NSKVONotifyin_Person。不被外界所看到。我们在p1添加过KVO监听之后，分别打印p1和p2对象的class可以发现他们都返回Person。如果NSKVONotifyin_Person不重写class方法，那么当对象要调用class对象方法的时候就会一直向上找来到nsobject，而nsobect的class的实现大致为返回自己isa指向的类，返回p1的isa指向的类那么打印出来的类就是NSKVONotifyin_Person
 猜测NSKVONotifyin_Person内重写的class内部实现大致为：
 ```php
@@ -146,7 +146,7 @@ NSKVONotifyin_Person重写class方法是为了隐藏NSKVONotifyin_Person。不�
     NSLog(@"didChangeValueForKey: - end");
 }
 ```
-## 总结：
+## ‼️总结：
 
 1. iOS用什么方式实现对一个对象的KVO？（KVO的本质是什么？）
 答. 当一个对象使用了KVO监听，iOS系统会修改这个对象的isa指针，改为指向一个全新的通过Runtime动态创建的子类，子类拥有自己的set方法实现，set方法实现内部会顺序调用willChangeValueForKey方法、原来的setter方法实现、didChangeValueForKey方法，而didChangeValueForKey方法内部又会调用监听器的observeValueForKeyPath:ofObject:change:context:监听方法。
