@@ -167,7 +167,7 @@ __HaviBlock__createBlock_block_impl_0 构造函数中传入的值存储在__Havi
 2. block代码中的代码被封装成为__HaviBlock__createBlock_block_func_0，FuncPtr则存储着__HaviBlock__createBlock_block_func_0的地址<br>
 3. Desc指向__HaviBlock__createBlock_block_desc_0结构体对象，其中存储着__HaviBlock__createBlock_block_impl_0结构体占用的空间；
 
-# 调用block执行内部函数：
+## 调用block执行内部函数：
 ```php
 
  ((void (*)(__block_impl *, int, int))((__block_impl *)block)->FuncPtr)((__block_impl *)block, 3, 5);
@@ -180,7 +180,7 @@ __HaviBlock__createBlock_block_impl_0 构造函数中传入的值存储在__Havi
 
 FunPtr中存储着通过代码块封装的函数地址，那么调用这个函数，也就是执行代码快中的代码。回头看__HaviBlock__createBlock_block_func_0，可以发现第一个参数是_HaviBlock__createBlock_block_impl_0类型的指针，也就是说将block传入到了__HaviBlock__createBlock_block_func_0中，方便重中取出block捕获的值。
 
-# 验证Block本质确实是__HaviBlock__createBlock_block_impl_0结构体
+## 验证Block本质确实是__HaviBlock__createBlock_block_impl_0结构体
 方法：我们使用自定义和Block一致的结构体，并将block内部的结构体强制转化为我们自定义的结构体：
 ```php
 struct __main_block_desc_0 { 
@@ -215,13 +215,22 @@ int main(int argc, const char * argv[]) {
 
 ```
 通过打断点可以查看：
-![duan](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block2.png)
+![duan1](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block2.png)
 下面进入block内部，看一下堆栈信息中的函数调用地址。<strong>Debug workflow -> slways show Disassembly</strong>
 
-![duan](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block5.png)
+![duan2](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block5.png)
 
-# 总结：到这里我们从源码查看了所有和block有关的结构体，下面通过一张图解释各个结构体的关系：
-![duan](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block.png)
+## 总结：到这里我们从源码查看了所有和block有关的结构体，下面通过一张图解释各个结构体的关系：
+
+![duan3](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/Block.png)
+
+### Block的底层数据结构：
+
+![duan3](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block7.png)
+
+*****
+
+# Block捕获变量
 
 
 
