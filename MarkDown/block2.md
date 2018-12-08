@@ -59,5 +59,43 @@ int main(int argc, const char * argv[]) {
 }
 
 ```
-但是对
+但是对对block进行copy之后，person就不会被释放了；
+```php
+block = [^{
+   NSLog(@"------block内部%d",person.age);
+} copy];
+```
+‼️这是因为只要对栈空间的block进行一次copy就可以将block拷贝到堆中，person就不会被释放，这说明堆空间的block可能对person进行了一次retain操作，保障person不被销毁。堆空间的block自己销毁的时候会对持有的对象进行release操作。<br>
+‼️也就是说栈空间上的block不会对对象强引用，堆空间的block有能力持有外部调用的对象，即对对象进行强引用操作。
+
+### 有可能造成的问题：循环引用
+#### 1.__weak：可以使得在作用域执行完结束后就销毁。
+```php
+typedef void (^Block)(void);
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Block block;
+        {
+            Person *person = [[Person alloc] init];
+            person.age = 10;
+            
+            __weak Person *waekPerson = person;
+            block = ^{
+                NSLog(@"------block内部%d",waekPerson.age);
+            };
+        }
+        NSLog(@"--------");
+    }
+    return 0;
+}
+
+```
+下面来看编译成C++之后weak带来的变化：<br>
+> __weak 修饰变量，需要告知编译器使用ARC环境及版本会报错，添加<strong>-fobjc-arc -fobjc-runtime=ios-8.0.0</strong>
+```php
+xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc -fobjc-arc -fobjc-runtime=ios-8.0.0 main.m
+```
+
+
 
