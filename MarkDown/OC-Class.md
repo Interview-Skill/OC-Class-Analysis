@@ -1,5 +1,5 @@
 # Class本质
-无论类对象还是元类对象，类型都是Class类型；而其底层是objc_class结构体的指针，内存中就是结构体！
+‼️无论类对象还是元类对象，类型都是Class类型；而其底层是objc_class结构体的指针，内存中就是结构体！
 首先任何对象都是继承自NSObject;NSObject结构是：
 
 ```php
