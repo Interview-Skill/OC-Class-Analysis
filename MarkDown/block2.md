@@ -384,7 +384,77 @@ int main(int argc, const char * argv[]) {
 ```
 
 答：上面的代码没有问题！因为block块中仅仅是<strong>使用了array的内存地址，往内存地址中添加内容，并没有修改array的内存地址，因此array可以不需要使用__block修饰</strong><br>
-所以
+⚠️所以仅仅是使用局部变量的内存地址，而不是修改的时候，尽量不要添加__block，从源码看出，一旦添加了__block，编译器会创建响应的结构体，浪费内存。
+
+## 2.上面提到__block修饰的age变量在编译的时候会封装为结构体，那么当外部使用age的时候，使用的是__Block_byref_age_0结构体？还是使用__Block_byref_age_0结构体中的age变量？
+自定义结构体验证结构体内部结构
+```php
+typedef void (^Block)(void);
+
+struct __block_impl {
+    void *isa;
+    int Flags;
+    int Reserved;
+    void *FuncPtr;
+};
+
+struct __main_block_desc_0 {
+    size_t reserved;
+    size_t Block_size;
+    void (*copy)(void);
+    void (*dispose)(void);
+};
+
+struct __Block_byref_age_0 {
+    void *__isa;
+    struct __Block_byref_age_0 *__forwarding;
+    int __flags;
+    int __size;
+    int age;
+};
+struct __main_block_impl_0 {
+    struct __block_impl impl;
+    struct __main_block_desc_0* Desc;
+    struct __Block_byref_age_0 *age; // by ref
+};
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        __block int age = 10;
+        Block block = ^{
+            age = 20;
+            NSLog(@"age is %d",age);
+        };
+        block();
+        struct __main_block_impl_0 *blockImpl = (__bridge struct __main_block_impl_0 *)block;
+        NSLog(@"%p",&age);
+    }
+    return 0;
+}
+
+```
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block6.png)
+
+通过查看blockimpl结构体其中的内容，找到age结构体，查看两个元素：
+
+1.__forwarding其中存储的地址确实是age结构体变量自己的地址
+
+2.age中存储着改变后的变量20
+
+在block中使用或者修改age的时候都是通过结构体__Block_byref_age_0找到__forwarding再找到age的。另外apple隐藏了__Block_byref_age_0的结构体实现，打印age变量的地址就是__Block_byref_age_0结构体age变量的地址。
+
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block5.png)
+
+### ‼️通过上图的计算发现age的地址和__Block_byref_age_0结构体内部age值的地址相同。也就是说在外面使用age，代表就是结构体内的age值，也就是直接使用结构体内的 int age.
+
+****
+
+## __block的内存管理
+
+
+
+
+
 
 
 
