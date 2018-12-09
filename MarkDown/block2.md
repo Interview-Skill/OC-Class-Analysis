@@ -261,7 +261,7 @@ int main(int argc, const char * argv[]) {
 ### 1.age变量使用static修饰
 前面有提到<strong>static</strong>修饰的age变量传入block内部的时候是变量的指针，在__main_block_func_0内部可以拿到age变量的内存地址，因此可以直接修改。
 
-### 2.使用__block修饰
+### 2.使用__block修饰基础类型
 
 __block用于解决block内部不能修改该auto的问题，__block不能修饰静态变量（static)和全局变量
 
@@ -329,7 +329,68 @@ static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
 
 ![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block3.png)
 
-在
+在之后调用block,首先取出_block_impl_0中的age（这是个结构体），然后通过age结构体拿到__forwarding指针，上面知道__forwarding存储的就是__Block_byref_a_0结构体本身，再通过__forwarding获取结构体中的age值。<br>
+在后面的NSLog函数中也是这样获取的。
+
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block4.png)
+
+#### 为什么要通过__forwarding获取age变量的值？
+
+> ‼️__forwarding是指向自己的指针。这样做是为了方便内存管理。<br>
+总结：__block为什么能够改变变量的值很清楚了。__block将变量包装成为对象，然后把age封装在结构体里面，block内部存储的变量是结构体指针，当block内部需要age变量的时候可以通过指针找到内存地址进而进行修改变量的值。
+
+### 3.使用__block修饰对象类型
+
+如果变量本身就是对象呢？查看c++代码：
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        __block Person *person = [[Person alloc] init];
+        NSLog(@"%@",person);
+        Block block = ^{
+            person = [[Person alloc] init];
+            NSLog(@"%@",person);
+        };
+        block();
+    }
+    return 0;
+}
+
+```
+‼️通过查看C++代码，同样是将对象包装在了一个新的结构体中。结构体会多出来一个person对象，不一样的地方是结构体内部添加了两个内存管理函数：
+[__Block_byref_id_object_copy]（)和[__Block_byref_id_object_dispose]
+
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block2.png)
+
+[__Block_byref_id_object_copy]（)和[__Block_byref_id_object_dispose]函数的调用时机及作用和之前的一致。
+
+*****
+
+## 1.下面的代码是否有问题？
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        NSMutableArray *array = [NSMutableArray array];
+        Block block = ^{
+            [array addObject: @"5"];
+            [array addObject: @"5"];
+            NSLog(@"%@",array);
+        };
+        block();
+    }
+    return 0;
+}
+
+```
+
+答：上面的代码没有问题！因为block块中仅仅是<strong>使用了array的内存地址，往内存地址中添加内容，并没有修改array的内存地址，因此array可以不需要使用__block修饰</strong><br>
+所以
+
+
+
+
+
+
 
 
 
