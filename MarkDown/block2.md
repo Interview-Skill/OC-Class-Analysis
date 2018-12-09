@@ -460,6 +460,141 @@ int main(int argc, const char * argv[]) {
 首先看下内存变化：
 ![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m1.png)
 
+> 当block被copy到堆上的时候，block内部引用的__block变量也会被复制到堆上，并且持有变量，如果block复制到堆上的同时，__block变量已经在堆上了，则不会被复制。
+
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m7.png)
+
+
+> 当block从堆中移除的话，就会调用dispose函数，也就是_block_dispose_0函数，在_block_dispose_0函数内部会调用_Block_object_dispose函数，自动释放引用的_block变量。
+
+‼️blcok内部决定什么时候讲变量复制到堆中，什么时候对变量进行引用计数操作
+
+#### __block修饰的变量在block结构体中都是强引用，而其他类型的是由传入的对象的指针类型决定的。
+
+```php
+typedef void (^Block)(void);
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        int number = 20;
+        __block int age = 10;
+        
+        NSObject *object = [[NSObject alloc] init];
+        __weak NSObject *weakObj = object;
+        
+        Person *p = [[Person alloc] init];
+        __block Person *person = p;
+        __block __weak Person *weakPerson = p;
+        
+        Block block = ^ {
+            NSLog(@"%d",number); // 局部变量
+            NSLog(@"%d",age); // __block修饰的局部变量
+            NSLog(@"%p",object); // 对象类型的局部变量
+            NSLog(@"%p",weakObj); // __weak修饰的对象类型的局部变量
+            NSLog(@"%p",person); // __block修饰的对象类型的局部变量
+            NSLog(@"%p",weakPerson); // __block，__weak修饰的对象类型的局部变量
+        };
+        block();
+    }
+    return 0;
+}
+
+```
+
+转化为C++代码：
+```php
+
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  
+  int number;
+  NSObject *__strong object;
+  NSObject *__weak weakObj;
+  __Block_byref_age_0 *age; // by ref
+  __Block_byref_person_1 *person; // by ref
+  __Block_byref_weakPerson_2 *weakPerson; // by ref
+  
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, int _number, NSObject *__strong _object, NSObject *__weak _weakObj, __Block_byref_age_0 *_age, __Block_byref_person_1 *_person, __Block_byref_weakPerson_2 *_weakPerson, int flags=0) : number(_number), object(_object), weakObj(_weakObj), age(_age->__forwarding), person(_person->__forwarding), weakPerson(_weakPerson->__forwarding) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+```
+
+‼️从上面可以可以看出：
+1. 没有使用[__block]()修饰的变量(object 和 weakObjc)是根据他们自身被block捕获的指针类型进行强引用或者弱引用。<br>
+2. 一旦使用了__blcok修饰的变量，在__main_block_impl_0内部一律使用强指针引用生成的结构体。
+
+#### 被__block修饰的变量生成的结构体有什么不同？
+
+```php
+struct __Block_byref_age_0 {
+  void *__isa;
+  __Block_byref_age_0 *__forwarding;
+  int __flags;
+  int __size;
+  int age;
+};
+
+struct __Block_byref_person_1 {
+  void *__isa;
+  __Block_byref_person_1 *__forwarding;
+  int __flags;
+  int __size;
+  void (*__Block_byref_id_object_copy)(void*, void*);
+  void (*__Block_byref_id_object_dispose)(void*);
+  Person *__strong person;
+};
+
+struct __Block_byref_weakPerson_2 {
+  void *__isa;
+  __Block_byref_weakPerson_2 *__forwarding;
+  int __flags;
+  int __size;
+  void (*__Block_byref_id_object_copy)(void*, void*);
+  void (*__Block_byref_id_object_dispose)(void*);
+  Person *__weak weakPerson;
+};
+
+```
+
+1.__block修饰的对象类型的变量生成的结构体内多了[__Block_byref_id_object_copy]（)和[__Block_byref_id_object_dispose]对包装的对象进行内存管理。
+
+2. 而生成的结构体对象的引用类型，则取决于block捕获的对象类型的变量的引用类型，weakPerson是弱引用，所以指针__Block_byref_weakPerson_2 对weakPerson是弱引用，person是强指针，所以__Block_byref_person_1对person是强引用。
+
+```php
+static void __main_block_copy_0(struct __main_block_impl_0*dst, struct __main_block_impl_0*src) {
+    _Block_object_assign((void*)&dst->age, (void*)src->age, 8/*BLOCK_FIELD_IS_BYREF*/);
+    _Block_object_assign((void*)&dst->object, (void*)src->object, 3/*BLOCK_FIELD_IS_OBJECT*/);
+    _Block_object_assign((void*)&dst->weakObj, (void*)src->weakObj, 3/*BLOCK_FIELD_IS_OBJECT*/);
+    _Block_object_assign((void*)&dst->person, (void*)src->person, 8/*BLOCK_FIELD_IS_BYREF*/);
+    _Block_object_assign((void*)&dst->weakPerson, (void*)src->weakPerson, 8/*BLOCK_FIELD_IS_BYREF*/);
+}
+
+```
+__main_block_copy_0函数会根据变量的强弱指针及有没有对__block修饰做出不同的处理，强指针在block内部被强引用，若指针在block内部产生弱引用。
+
+当block从堆中移除的时候会通过dispose函数释放他们：
+
+```php
+static void __main_block_dispose_0(struct __main_block_impl_0*src) {
+    _Block_object_dispose((void*)src->age, 8/*BLOCK_FIELD_IS_BYREF*/);
+    _Block_object_dispose((void*)src->object, 3/*BLOCK_FIELD_IS_OBJECT*/);
+    _Block_object_dispose((void*)src->weakObj, 3/*BLOCK_FIELD_IS_OBJECT*/);
+    _Block_object_dispose((void*)src->person, 8/*BLOCK_FIELD_IS_BYREF*/);
+    _Block_object_dispose((void*)src->weakPerson, 8/*BLOCK_FIELD_IS_BYREF*/);
+    
+}
+
+```
+
+### 
+
+
+
 
 
 
