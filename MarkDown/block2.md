@@ -327,6 +327,9 @@ static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
 
 接着降__Block_byref_a_0结构体age存入_block_impl_0中，并赋值给__Block_byref_a_0 *age；
 
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block3.png)
+
+在
 
 
 
