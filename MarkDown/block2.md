@@ -274,8 +274,30 @@ __block int age = 10
 首先被__block修饰的age变量声明变成了<strong>__Block_byref_age_0 </strong>的结构体，也就是说加上__block修饰的话捕获到block内部的变量是<strong>__Block_byref_age_0 </strong>类型的结构体。编译器在传给block之前把变量age封装成了一个__Block_byref_age_0类型的结构体。
 
 ```php
+//被封装为的结构体
+struct __Verify__block___createBlock_block_impl_0 {
+  struct __block_impl impl;
+  struct __Verify__block___createBlock_block_desc_0* Desc;
+  __Block_byref_a_0 *a; // by ref
+  __Verify__block___createBlock_block_impl_0(void *fp, struct __Verify__block___createBlock_block_desc_0 *desc,                         
+  __Block_byref_a_0 *_a, int flags=0) : a(_a->__forwarding) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+struct __Block_byref_a_0 {
+    void *__isa;
+    __Block_byref_a_0 *__forwarding;
+    int __flags;
+    int __size;
+    int a;
+};
+
 static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
-    __attribute__((__blocks__(byref))) __Block_byref_a_0 a = {
+     __attribute__((__blocks__(byref))) __Block_byref_a_0 a = {
                                                                 (void*)0,
                                                                 (__Block_byref_a_0 *)&a, 
                                                                 0, 
@@ -283,14 +305,27 @@ static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
                                                                 10
                                                               };//先对变量age进行封装
 
- void (*block)(void) = ((void (*)())&__Verify__block___createBlock_block_impl_0((void *)__Verify__block___createBlock_block_func_0, &__Verify__block___createBlock_block_desc_0_DATA, (__Block_byref_a_0 *)&a, 570425344));
- ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+    void (*block)(void) = ((void (*)())&__Verify__block___createBlock_block_impl_0(
+                                            (void *)__Verify__block___createBlock_block_func_0,
+                                            &__Verify__block___createBlock_block_desc_0_DATA, 
+                                            (__Block_byref_a_0 *)&a,
+                                            570425344)
+                                            );
+    
+    ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+
 }
 ```
 
 ![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block1.png)
 
->
+>1. [__isa指针：]():__Block_byref_a_0里面也有一个isa指针，因此说明__Block_byref_a_0本质也是一个对象。<br>
+2.[__forwarding]():__forwarding是__Block_byref_a_0类型的结构体，并且__forwarding存储的是(__Block_byref_a_0 *)&a，即结构体自己的地址。<br>
+3.[__flag]():0<br>
+4.[__size]():sizeof(__Block_byref_age_0)即__Block_byref_age_0占用的内存空间<br>
+5.[age]():这个才是真正存储age的地方
+
+接着降__Block_byref_a_0结构体age存入_block_impl_0中，并赋值给__Block_byref_a_0 *age；
 
 
 
