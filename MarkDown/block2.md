@@ -239,7 +239,52 @@ Person 先销毁再执行block，为null
 ****
 
 ## block修改变量的值
+示例代码
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        int age = 10;
+        Block block = ^ {
+            // age = 20; // 无法修改
+            NSLog(@"%d",age);
+        };
+        block();
+    }
+    return 0;
+}
 
+```
+默认情况下，block内部是不可以修改局部变量的。通过前面的分析我们知道基础类型是拷贝到block内部一份的。<br>
+> [age]()是在main函数内声明的，所以age是存在于函数main的栈空间的，但是block内部的代码在__main_block_func_o函数内部。__main_block_func_0函数内部是无法访问age变量的内存空间的，两个函数的栈空间不一样，__main_block_func_0拿到的age是block结构体内部的age（age被copy过来的），因此无法在__main_block_func_0函数内部修改main函数内的变量。<br>
+## 解决办法：
+
+### 1.age变量使用static修饰
+前面有提到<strong>static</strong>修饰的age变量传入block内部的时候是变量的指针，在__main_block_func_0内部可以拿到age变量的内存地址，因此可以直接修改。
+
+### 2.使用__block修饰
+
+__block用于解决block内部不能修改该auto的问题，__block不能修饰静态变量（static)和全局变量
+
+```php
+__block int age = 10
+```
+编译器会将__block修饰的变量包装成为一个对象，我们查看底层C++代码：
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block.png)
+
+首先被__block修饰的age变量声明变成了<strong>__Block_byref_age_0 </strong>的结构体，也就是说加上__block修饰的话捕获到block内部的变量是<strong>__Block_byref_age_0 </strong>类型的结构体。编译器在传给block之前把变量age封装成了一个__Block_byref_age_0类型的结构体。
+
+```php
+static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
+ __attribute__((__blocks__(byref))) __Block_byref_a_0 a = {(void*)0,(__Block_byref_a_0 *)&a, 0, sizeof(__Block_byref_a_0), 10};//先对变量age进行封装
+
+ void (*block)(void) = ((void (*)())&__Verify__block___createBlock_block_impl_0((void *)__Verify__block___createBlock_block_func_0, &__Verify__block___createBlock_block_desc_0_DATA, (__Block_byref_a_0 *)&a, 570425344));
+ ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
+}
+```
+
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/__block1.png)
+
+>
 
 
 
