@@ -591,7 +591,289 @@ static void __main_block_dispose_0(struct __main_block_impl_0*src) {
 
 ```
 
-### 
+### __forwarding指针
+
+上面看到__forwarding指针指向的是结构体自己。当使用变量的时候，通过结构体找到__forwarding指针，再通过__forwarding指针找到相应的变量。这样是为了方便内存管理。通过上面的__block变量的内存地址的分析，block被复制到堆上的时候，会将block中引用的变量也复制到堆中。
+
+重新看下在block修改__block修饰的变量：
+
+```php
+static void __main_block_func_0(struct __main_block_impl_0 *__cself) {
+  __Block_byref_age_0 *age = __cself->age; // bound by ref
+            (age->__forwarding->age) = 20;
+            NSLog((NSString *)&__NSConstantStringImpl__var_folders_jm_dztwxsdn7bvbz__xj2vlp8980000gn_T_main_b05610_mi_0,(age->__forwarding->age));
+        }
+
+
+```
+
+通过源码知道，当修改__block修饰的的变量的时候，是根据变量生成的结构体,这里是[__Block_byref_age_0]()找到其中的__forwarding指针，__forwarding指向的是自己，因此可以找到age进行修改。
+
+当block在栈中的时候，__Block_byref_age_0结构体中的__forwarding指向结构体自己。
+
+而当block被复制到堆中的时候，栈中的 __Block_byref_age_0 结构体也会被复制到堆中一份，而此时栈中的 __forwarding 指向对中的__Block_byref_age_0 结构体，而堆中的 __Block_byref_age_0 结构体中的 __forwarding还是指向自己。
+
+```php
+// 栈中的age
+__Block_byref_age_0 *age = __cself->age; // bound by ref
+// age->__forwarding获取堆中的age结构体
+// age->__forwarding->age 修改堆中age结构体的age变量
+(age->__forwarding->age) = 20;
+
+```
+
+此时对age进行修改：通过__forwarding指针巧妙的将修改的变量赋值给堆中的__Block_byref_age_0中。
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m8.png)
+
+‼️因此block内部拿到的变量实际上是在堆上的，当block进行copy被复制到堆上的时候，_Block_object_assign函数内做了这一系列的操作。
+
+### 被__block修饰的对象类型的内存管理
+
+#### 1.强引用
+
+```php
+ypedef void (^Block)(void);
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        __block Person *person = [[Person alloc] init];
+        Block block = ^ {
+            NSLog(@"%p", person);
+        };
+        block();
+    }
+    return 0;
+}
+
+```
+
+C++代码：
+```php
+
+__Block_byref_person_0结构体
+
+typedef void (*Block)(void);
+struct __Block_byref_person_0 {
+  void *__isa;  // 8 内存空间
+__Block_byref_person_0 *__forwarding; // 8
+ int __flags; // 4
+ int __size;  // 4
+ void (*__Block_byref_id_object_copy)(void*, void*); // 8
+ void (*__Block_byref_id_object_dispose)(void*); // 8
+ Person *__strong person; // 8
+};
+// 8 + 8 + 4 + 4 + 8 + 8 + 8 = 48
+
+
+// __Block_byref_person_0结构体声明
+
+__attribute__((__blocks__(byref))) __Block_byref_person_0 person = {
+    (void*)0,
+    (__Block_byref_person_0 *)&person,
+    33554432,
+    sizeof(__Block_byref_person_0),
+    __Block_byref_id_object_copy_131,
+    __Block_byref_id_object_dispose_131,
+    
+    ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("Person"), sel_registerName("alloc")), sel_registerName("init"))
+};
+
+```
+
+之前提到过__block修饰的对象类型生成的结构体中新增加了两个函数void (*__Block_byref_id_object_copy)(void*, void*);和void (*__Block_byref_id_object_dispose)(void*);。这两个函数为__block修饰的对象提供了内存管理的操作。
+
+
+可以看出为void (*__Block_byref_id_object_copy)(void*, void*);和void (*__Block_byref_id_object_dispose)(void*);赋值的分别为__Block_byref_id_object_copy_131和__Block_byref_id_object_dispose_131。找到这两个函数
+
+```php
+static void __Block_byref_id_object_copy_131(void *dst, void *src) {
+ _Block_object_assign((char*)dst + 40, *(void * *) ((char*)src + 40), 131);
+}
+static void __Block_byref_id_object_dispose_131(void *src) {
+ _Block_object_dispose(*(void * *) ((char*)src + 40), 131);
+}
+
+```
+
+上述源码中可以发现__Block_byref_id_object_copy_131函数中同样调用了_Block_object_assign函数，而_Block_object_assign函数内部拿到dst指针即block对象自己的地址值加上40个字节。并且_Block_object_assign最后传入的参数是131，同block直接对对象进行内存管理传入的参数3，8都不同。可以猜想_Block_object_assign内部根据传入的参数不同进行不同的操作的。
+通过对上面__Block_byref_person_0结构体占用空间计算发现__Block_byref_person_0结构体占用的空间为48个字节。而加40恰好指向的就为person指针。
+也就是说copy函数会将person地址传入_Block_object_assign函数，_Block_object_assign中对Person对象进行强引用或者弱引用。
+
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m3.png)
+
+#### 2.弱引用情况：
+
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Person *person = [[Person alloc] init];
+        __block __weak Person *weakPerson = person;
+        Block block = ^ {
+            NSLog(@"%p", weakPerson);
+        };
+        block();
+    }
+    return 0;
+}
+
+```
+C++代码：
+
+```php
+
+struct __main_block_impl_0 {
+  struct __block_impl impl;
+  struct __main_block_desc_0* Desc;
+  __Block_byref_weakPerson_0 *weakPerson; // by ref
+  __main_block_impl_0(void *fp, struct __main_block_desc_0 *desc, __Block_byref_weakPerson_0 *_weakPerson, int flags=0) : weakPerson(_weakPerson->__forwarding) {
+    impl.isa = &_NSConcreteStackBlock;
+    impl.Flags = flags;
+    impl.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+
+```
+
+__main_block_impl_0中没有任何变化，__main_block_impl_0对weakPerson依然是强引用，但是__Block_byref_weakPerson_0中对weakPerson变为了__weak指针。
+
+```php
+struct __Block_byref_weakPerson_0 {
+  void *__isa;
+__Block_byref_weakPerson_0 *__forwarding;
+ int __flags;
+ int __size;
+ void (*__Block_byref_id_object_copy)(void*, void*);
+ void (*__Block_byref_id_object_dispose)(void*);
+ Person *__weak weakPerson;
+};
+
+```
+
+也就是说无论如何block内部中对__block修饰变量生成的结构体都是强引用，结构体内部对外部变量的引用取决于传入block内部的变量是强引用还是弱引用。
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m2.png)
+
+#### 3.MRC情况
+mrc环境下，尽管调用了copy操作，__block结构体不会对person产生强引用，依然是弱引用。
+
+```php
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        __block Person *person = [[Person alloc] init];
+        Block block = [^ {
+            NSLog(@"%p", person);
+        } copy];
+        [person release];
+        block();
+        [block release];
+    }
+    return 0;
+}
+
+```
+上述代码person会先释放
+
+```php
+block的copy[50480:8737001] -[Person dealloc]
+block的copy[50480:8737001] 0x100669a50
+```
+当block从堆中移除的时候。会调用dispose函数，block块中去除对__Block_byref_person_0 *person;的引用，__Block_byref_person_0结构体中也会调用dispose操作去除对Person *person;的引用。以保证结构体和结构体内部的对象可以正常释放。
+
+******
+
+## 循环引用
+循环引用导致内存泄漏：
+
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Person *person = [[Person alloc] init];
+        person.age = 10;
+        person.block = ^{
+            NSLog(@"%d",person.age);
+        };
+    }
+    NSLog(@"大括号结束啦");
+    return 0;
+}
+
+```
+可以发现大括号结束之后，person依然没有被释放，产生了循环引用。
+block的copy[55423:9158212] 大括号结束啦
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m4.png)
+
+从上图我们看到Person对象和block之间产生了强引用。
+
+## 解决循环引用--ARC
+
+为了执行block，我们希望person对block是强引用，而block内部对person为弱引用最好。
+
+使用[__weak]()和[__unsafe_unretained]修饰可以解决循环引用。
+
+上面知道weak会使得block内部将指针变为弱引用。block对person为弱引用的话，就不会出现循环引用了。
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m5.png)
+
+#### __weak 和 __unsafe_unretained的区别：
+1. __weak不会产生强引用，指向的对象销毁时，会自动将指针置为nil.因此一般都是通过__weak解决循环引用。<br>
+2. __unsafe_unretained不会产生前引用，不安全，指向的对象销毁时，指针存储的地址值不变。
+3. __block也可以解决循环引用。
+
+```php
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        __block Person *person = [[Person alloc] init];
+        person.age = 10;
+        person.block = ^{
+            NSLog(@"%d",person.age);
+            person = nil;
+        };
+        person.block();
+    }
+    NSLog(@"大括号结束啦");
+    return 0;
+}
+
+```
+上面的相互引用关系：
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m6.png)
+
+上面我们提到过，在block内部使用变量使用的其实是__block修饰的变量生成的结构体__Block_byref_person_0内部的person对象，那么当person对象置为nil也就断开了结构体对person的强引用，那么三角的循环引用就自动断开。该释放的时候就会释放了。但是有弊端，必须执行block，并且在block内部将person对象置为nil。也就是说在block执行之前代码是因为循环引用导致内存泄漏的。
+
+## 解决循环引用问题 - MRC
+使用__unsafe_unretained解决。在MRC环境下不支持使用__weak，使用原理同ARC环境下相同，这里不在赘述。
+使用__block也能解决循环引用的问题。因为上文__block内存管理中提到过，MRC环境下，尽管调用了copy操作，__block结构体不会对person产生强引用，依然是弱引用。因此同样可以解决循环引用的问题。
+
+## __strong 和 __weak
+
+```php
+__strong 和 __weak
+__weak typeof(self) weakSelf = self;
+person.block = ^{
+    __strong typeof(weakSelf) myself = weakSelf;
+    NSLog(@"age is %d", myself->_age);
+};
+```
+
+在block内部重新使用__strong修饰self变量是为了在block内部有一个强指针指向weakSelf避免在block调用的时候weakSelf已经被销毁。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
