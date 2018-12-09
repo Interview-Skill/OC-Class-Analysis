@@ -275,7 +275,13 @@ __block int age = 10
 
 ```php
 static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
- __attribute__((__blocks__(byref))) __Block_byref_a_0 a = {(void*)0,(__Block_byref_a_0 *)&a, 0, sizeof(__Block_byref_a_0), 10};//先对变量age进行封装
+    __attribute__((__blocks__(byref))) __Block_byref_a_0 a = {
+                                                                (void*)0,
+                                                                (__Block_byref_a_0 *)&a, 
+                                                                0, 
+                                                                sizeof(__Block_byref_a_0), 
+                                                                10
+                                                              };//先对变量age进行封装
 
  void (*block)(void) = ((void (*)())&__Verify__block___createBlock_block_impl_0((void *)__Verify__block___createBlock_block_func_0, &__Verify__block___createBlock_block_desc_0_DATA, (__Block_byref_a_0 *)&a, 570425344));
  ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
