@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "565795085.56401"
+            timestampString = "566016785.184991"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "71"
@@ -26,7 +26,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "565795085.564106"
+            timestampString = "566016785.185077"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "64"
@@ -42,7 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "565795085.564177"
+            timestampString = "566016785.185138"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "98"
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "565795085.564242"
+            timestampString = "566016785.1851929"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "123"
-            endingLineNumber = "123"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
             landmarkName = "ViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -74,7 +74,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "565795085.564307"
+            timestampString = "566016785.185249"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "117"
@@ -97,6 +97,69 @@
             endingLineNumber = "41"
             landmarkName = "-verifyBlock"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/Block/Verify__block_.m"
+            timestampString = "566016785.185365"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "26"
+            endingLineNumber = "26"
+            landmarkName = "-createBlock"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[Verify__block_ createBlock]"
+                  moduleName = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/hli7/Desktop/Demo/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/Block/Verify__block_.m"
+                  timestampString = "566016768.256678"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "26"
+                  endingLineNumber = "26"
+                  offsetFromSymbolStart = "53">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__29-[Verify__block_ createBlock]_block_invoke"
+                  moduleName = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/hli7/Desktop/Demo/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/Block/Verify__block_.m"
+                  timestampString = "566016768.258616"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "26"
+                  endingLineNumber = "26"
+                  offsetFromSymbolStart = "19">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__destroy_helper_block_"
+                  moduleName = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/hli7/Desktop/Demo/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/Block/Verify__block_.m"
+                  timestampString = "566016768.2604769"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "26"
+                  endingLineNumber = "26"
+                  offsetFromSymbolStart = "17">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

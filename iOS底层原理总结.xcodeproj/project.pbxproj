@@ -17,7 +17,7 @@
 		482D733821B8042C00A83F0A /* CategoryPerson+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733721B8042C00A83F0A /* CategoryPerson+Test.m */; };
 		482D733B21B8043A00A83F0A /* CategoryPerson+TestTwo.m in Sources */ = {isa = PBXBuildFile; fileRef = 482D733A21B8043A00A83F0A /* CategoryPerson+TestTwo.m */; };
 		48AA46B621B955CB00378F24 /* CategoryStudent.m in Sources */ = {isa = PBXBuildFile; fileRef = 48AA46B521B955CB00378F24 /* CategoryStudent.m */; };
-		48AA46BC21B9690100378F24 /* HaviBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 48AA46BB21B9690100378F24 /* HaviBlock.m */; };
+		48AA46BC21B9690100378F24 /* HaviNewBlock.m in Sources */ = {isa = PBXBuildFile; fileRef = 48AA46BB21B9690100378F24 /* HaviNewBlock.m */; };
 		48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA6FE21B2C18300B32374 /* AppDelegate.m */; };
 		48CDA70221B2C18300B32374 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA70121B2C18300B32374 /* ViewController.m */; };
 		48CDA70521B2C18300B32374 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48CDA70321B2C18300B32374 /* Main.storyboard */; };
@@ -29,6 +29,8 @@
 		48CDA72C21B4190300B32374 /* PersonOne.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA72B21B4190300B32374 /* PersonOne.m */; };
 		48CDA72F21B41D6A00B32374 /* StuentOne.m in Sources */ = {isa = PBXBuildFile; fileRef = 48CDA72E21B41D6A00B32374 /* StuentOne.m */; };
 		48D915E421BAC5B200D31B09 /* VerifyBlockStruct.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D915E321BAC5B200D31B09 /* VerifyBlockStruct.m */; };
+		48D915EC21BBCCFD00D31B09 /* BlockSelfObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D915EB21BBCCFD00D31B09 /* BlockSelfObject.m */; };
+		48D915F021BCBA1F00D31B09 /* Verify__block_.m in Sources */ = {isa = PBXBuildFile; fileRef = 48D915EF21BCBA1F00D31B09 /* Verify__block_.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -231,10 +233,9 @@
 		482D733C21B8070100A83F0A /* CategoryPerson+Test.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "CategoryPerson+Test.cpp"; sourceTree = "<group>"; };
 		48AA46B421B955CB00378F24 /* CategoryStudent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryStudent.h; sourceTree = "<group>"; };
 		48AA46B521B955CB00378F24 /* CategoryStudent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryStudent.m; sourceTree = "<group>"; };
-		48AA46BA21B9690100378F24 /* HaviBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HaviBlock.h; sourceTree = "<group>"; };
-		48AA46BB21B9690100378F24 /* HaviBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HaviBlock.m; sourceTree = "<group>"; };
+		48AA46BA21B9690100378F24 /* HaviNewBlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HaviNewBlock.h; sourceTree = "<group>"; };
+		48AA46BB21B9690100378F24 /* HaviNewBlock.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HaviNewBlock.m; sourceTree = "<group>"; };
 		48AA46BD21B96A2A00378F24 /* HaviBlock1.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HaviBlock1.cpp; sourceTree = "<group>"; };
-		48AA46BE21BA12D300378F24 /* HaviBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HaviBlock.cpp; sourceTree = "<group>"; };
 		48CDA6FA21B2C18300B32374 /* iOS底层原理总结.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS底层原理总结.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CDA6FD21B2C18300B32374 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48CDA6FE21B2C18300B32374 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -373,6 +374,14 @@
 		48CDA86821B4362000B32374 /* objc.vcproj */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = objc.vcproj; sourceTree = "<group>"; };
 		48D915E221BAC5B200D31B09 /* VerifyBlockStruct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VerifyBlockStruct.h; sourceTree = "<group>"; };
 		48D915E321BAC5B200D31B09 /* VerifyBlockStruct.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VerifyBlockStruct.m; sourceTree = "<group>"; };
+		48D915E821BBBC2200D31B09 /* HaviBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HaviBlock.cpp; sourceTree = "<group>"; };
+		48D915E921BBBE9C00D31B09 /* HaviNewBlock.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = HaviNewBlock.cpp; sourceTree = "<group>"; };
+		48D915EA21BBCCFD00D31B09 /* BlockSelfObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlockSelfObject.h; sourceTree = "<group>"; };
+		48D915EB21BBCCFD00D31B09 /* BlockSelfObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockSelfObject.m; sourceTree = "<group>"; };
+		48D915ED21BBCDB000D31B09 /* BlockSelfObject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BlockSelfObject.cpp; sourceTree = "<group>"; };
+		48D915EE21BCBA1F00D31B09 /* Verify__block_.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Verify__block_.h; sourceTree = "<group>"; };
+		48D915EF21BCBA1F00D31B09 /* Verify__block_.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Verify__block_.m; sourceTree = "<group>"; };
+		48D915F121BCBB5F00D31B09 /* Verify__block_.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Verify__block_.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -621,11 +630,18 @@
 		48AA46B921B9654700378F24 /* Block */ = {
 			isa = PBXGroup;
 			children = (
-				48AA46BA21B9690100378F24 /* HaviBlock.h */,
-				48AA46BB21B9690100378F24 /* HaviBlock.m */,
+				48AA46BA21B9690100378F24 /* HaviNewBlock.h */,
+				48AA46BB21B9690100378F24 /* HaviNewBlock.m */,
+				48D915EA21BBCCFD00D31B09 /* BlockSelfObject.h */,
+				48D915EB21BBCCFD00D31B09 /* BlockSelfObject.m */,
+				48D915ED21BBCDB000D31B09 /* BlockSelfObject.cpp */,
+				48D915E921BBBE9C00D31B09 /* HaviNewBlock.cpp */,
 				48D915E221BAC5B200D31B09 /* VerifyBlockStruct.h */,
 				48D915E321BAC5B200D31B09 /* VerifyBlockStruct.m */,
-				48AA46BE21BA12D300378F24 /* HaviBlock.cpp */,
+				48D915EE21BCBA1F00D31B09 /* Verify__block_.h */,
+				48D915EF21BCBA1F00D31B09 /* Verify__block_.m */,
+				48D915F121BCBB5F00D31B09 /* Verify__block_.cpp */,
+				48D915E821BBBC2200D31B09 /* HaviBlock.cpp */,
 				48AA46BD21B96A2A00378F24 /* HaviBlock1.cpp */,
 			);
 			path = Block;
@@ -987,18 +1003,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				482D733821B8042C00A83F0A /* CategoryPerson+Test.m in Sources */,
-				48AA46BC21B9690100378F24 /* HaviBlock.m in Sources */,
+				48AA46BC21B9690100378F24 /* HaviNewBlock.m in Sources */,
 				482D733B21B8043A00A83F0A /* CategoryPerson+TestTwo.m in Sources */,
 				481E5A8221B61623004BFEA8 /* KVOPerson.m in Sources */,
 				481E5B3C21B6D1F5004BFEA8 /* RunLoopChildViewController.m in Sources */,
 				48CDA72C21B4190300B32374 /* PersonOne.m in Sources */,
 				481E5B3921B6CB53004BFEA8 /* RunLoopView.m in Sources */,
 				48AA46B621B955CB00378F24 /* CategoryStudent.m in Sources */,
+				48D915EC21BBCCFD00D31B09 /* BlockSelfObject.m in Sources */,
 				48CDA70221B2C18300B32374 /* ViewController.m in Sources */,
 				48CDA70D21B2C18400B32374 /* main.m in Sources */,
 				48D915E421BAC5B200D31B09 /* VerifyBlockStruct.m in Sources */,
 				48CDA72F21B41D6A00B32374 /* StuentOne.m in Sources */,
 				48CDA6FF21B2C18300B32374 /* AppDelegate.m in Sources */,
+				48D915F021BCBA1F00D31B09 /* Verify__block_.m in Sources */,
 				482D733521B8040600A83F0A /* CategoryPerson.m in Sources */,
 				48CDA72721B3648D00B32374 /* Student.m in Sources */,
 			);
@@ -1158,6 +1176,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "iOS底层原理总结/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1174,6 +1193,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LIBRARY = "libc++";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "iOS底层原理总结/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (

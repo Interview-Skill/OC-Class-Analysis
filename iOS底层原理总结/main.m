@@ -10,12 +10,24 @@
 #import "AppDelegate.h"
 #import "Student.h"
 #import <objc/runtime.h>
+typedef void (^Block) (void);
 
 int main(int argc, char * argv[]) {
 	@autoreleasepool {
 		NSLog(@"begin");
 		int re = UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
 		NSLog(@"end");
+		Block block;
+		{
+			Student *p = [Student new];
+			p.name = @"10";
+			block = ^ {
+				NSLog(@"person age: %d",p.name);
+			};
+			
+		}
 		return re;
 	}
 }
+
+

@@ -106,11 +106,7 @@ struct __AtAutoreleasePool {
 };
 
 #define __OFFSETOFIVAR__(TYPE, MEMBER) ((long long) &((TYPE *)0)->MEMBER)
-static __NSConstantStringImpl __NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_0 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"this is an block, a = %d, b = %d",32};
-static __NSConstantStringImpl __NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_1 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"this is an block, age = %d",26};
-static __NSConstantStringImpl __NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_2 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"this is an block, a = %d, b = %d",32};
-static __NSConstantStringImpl __NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_3 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"this is an block, age = %d",26};
-static __NSConstantStringImpl __NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_4 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"this is an block, ageB = %d",27};
+static __NSConstantStringImpl __NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_Verify__block__ed11b2_mi_0 __attribute__ ((section ("__DATA, __cfstring"))) = {__CFConstantStringClassReference,0x000007c8,"print a:%d",10};
 
 
 
@@ -33153,13 +33149,13 @@ struct NSUUID_IMPL {
 #pragma clang assume_nonnull begin
 
 
-#ifndef _REWRITER_typedef_HaviBlock
-#define _REWRITER_typedef_HaviBlock
-typedef struct objc_object HaviBlock;
-typedef struct {} _objc_exc_HaviBlock;
+#ifndef _REWRITER_typedef_Verify__block_
+#define _REWRITER_typedef_Verify__block_
+typedef struct objc_object Verify__block_;
+typedef struct {} _objc_exc_Verify__block_;
 #endif
 
-struct HaviBlock_IMPL {
+struct Verify__block__IMPL {
 	struct NSObject_IMPL NSObject_IVARS;
 };
 
@@ -33168,94 +33164,58 @@ struct HaviBlock_IMPL {
 
 #pragma clang assume_nonnull end
 
-// @implementation HaviBlock
+// @implementation Verify__block_
 
 
-static instancetype _I_HaviBlock_init(HaviBlock * self, SEL _cmd) {
- self = ((HaviBlock *(*)(__rw_objc_super *, SEL))(void *)objc_msgSendSuper)((__rw_objc_super){(id)self, (id)class_getSuperclass(objc_getClass("HaviBlock"))}, sel_registerName("init"));
+static instancetype _I_Verify__block__init(Verify__block_ * self, SEL _cmd) {
+ self = ((Verify__block_ *(*)(__rw_objc_super *, SEL))(void *)objc_msgSendSuper)((__rw_objc_super){(id)self, (id)class_getSuperclass(objc_getClass("Verify__block_"))}, sel_registerName("init"));
  if (self) {
   ((void (*)(id, SEL))(void *)objc_msgSend)((id)self, sel_registerName("createBlock"));
-  ((void (*)(id, SEL))(void *)objc_msgSend)((id)self, sel_registerName("verifyBlock"));
  }
  return self;
 }
 
-struct __Block_byref_age_0 {
+struct __Block_byref_a_0 {
   void *__isa;
-__Block_byref_age_0 *__forwarding;
+__Block_byref_a_0 *__forwarding;
  int __flags;
  int __size;
- int age;
+ int a;
 };
 
-struct __HaviBlock__createBlock_block_impl_0 {
+struct __Verify__block___createBlock_block_impl_0 {
   struct __block_impl impl;
-  struct __HaviBlock__createBlock_block_desc_0* Desc;
-  __Block_byref_age_0 *age; // by ref
-  __HaviBlock__createBlock_block_impl_0(void *fp, struct __HaviBlock__createBlock_block_desc_0 *desc, __Block_byref_age_0 *_age, int flags=0) : age(_age->__forwarding) {
+  struct __Verify__block___createBlock_block_desc_0* Desc;
+  __Block_byref_a_0 *a; // by ref
+  __Verify__block___createBlock_block_impl_0(void *fp, struct __Verify__block___createBlock_block_desc_0 *desc, __Block_byref_a_0 *_a, int flags=0) : a(_a->__forwarding) {
     impl.isa = &_NSConcreteStackBlock;
     impl.Flags = flags;
     impl.FuncPtr = fp;
     Desc = desc;
   }
 };
-static void __HaviBlock__createBlock_block_func_0(struct __HaviBlock__createBlock_block_impl_0 *__cself, int a, int b) {
-  __Block_byref_age_0 *age = __cself->age; // bound by ref
+static void __Verify__block___createBlock_block_func_0(struct __Verify__block___createBlock_block_impl_0 *__cself) {
+  __Block_byref_a_0 *a = __cself->a; // bound by ref
 
-  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_0,a,b);
-  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_1,(age->__forwarding->age) );
+  (a->__forwarding->a) = 20;
+  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_Verify__block__ed11b2_mi_0,(a->__forwarding->a));
  }
-static void __HaviBlock__createBlock_block_copy_0(struct __HaviBlock__createBlock_block_impl_0*dst, struct __HaviBlock__createBlock_block_impl_0*src) {_Block_object_assign((void*)&dst->age, (void*)src->age, 8/*BLOCK_FIELD_IS_BYREF*/);}
+static void __Verify__block___createBlock_block_copy_0(struct __Verify__block___createBlock_block_impl_0*dst, struct __Verify__block___createBlock_block_impl_0*src) {_Block_object_assign((void*)&dst->a, (void*)src->a, 8/*BLOCK_FIELD_IS_BYREF*/);}
 
-static void __HaviBlock__createBlock_block_dispose_0(struct __HaviBlock__createBlock_block_impl_0*src) {_Block_object_dispose((void*)src->age, 8/*BLOCK_FIELD_IS_BYREF*/);}
+static void __Verify__block___createBlock_block_dispose_0(struct __Verify__block___createBlock_block_impl_0*src) {_Block_object_dispose((void*)src->a, 8/*BLOCK_FIELD_IS_BYREF*/);}
 
-static struct __HaviBlock__createBlock_block_desc_0 {
+static struct __Verify__block___createBlock_block_desc_0 {
   size_t reserved;
   size_t Block_size;
-  void (*copy)(struct __HaviBlock__createBlock_block_impl_0*, struct __HaviBlock__createBlock_block_impl_0*);
-  void (*dispose)(struct __HaviBlock__createBlock_block_impl_0*);
-} __HaviBlock__createBlock_block_desc_0_DATA = { 0, sizeof(struct __HaviBlock__createBlock_block_impl_0), __HaviBlock__createBlock_block_copy_0, __HaviBlock__createBlock_block_dispose_0};
+  void (*copy)(struct __Verify__block___createBlock_block_impl_0*, struct __Verify__block___createBlock_block_impl_0*);
+  void (*dispose)(struct __Verify__block___createBlock_block_impl_0*);
+} __Verify__block___createBlock_block_desc_0_DATA = { 0, sizeof(struct __Verify__block___createBlock_block_impl_0), __Verify__block___createBlock_block_copy_0, __Verify__block___createBlock_block_dispose_0};
 
-static void _I_HaviBlock_createBlock(HaviBlock * self, SEL _cmd) {
- __attribute__((__blocks__(byref))) __Block_byref_age_0 age = {(void*)0,(__Block_byref_age_0 *)&age, 0, sizeof(__Block_byref_age_0), 10};
- void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__createBlock_block_impl_0((void *)__HaviBlock__createBlock_block_func_0, &__HaviBlock__createBlock_block_desc_0_DATA, (__Block_byref_age_0 *)&age, 570425344));
- ((void (*)(__block_impl *, int, int))((__block_impl *)block)->FuncPtr)((__block_impl *)block, 3, 5);
-}
+static void _I_Verify__block__createBlock(Verify__block_ * self, SEL _cmd) {
+ __attribute__((__blocks__(byref))) __Block_byref_a_0 a = {(void*)0,(__Block_byref_a_0 *)&a, 0, sizeof(__Block_byref_a_0), 10};
 
-
-struct __HaviBlock__verifyBlock_block_impl_0 {
-  struct __block_impl impl;
-  struct __HaviBlock__verifyBlock_block_desc_0* Desc;
-  int age;
-  int *ageB;
-  __HaviBlock__verifyBlock_block_impl_0(void *fp, struct __HaviBlock__verifyBlock_block_desc_0 *desc, int _age, int *_ageB, int flags=0) : age(_age), ageB(_ageB) {
-    impl.isa = &_NSConcreteStackBlock;
-    impl.Flags = flags;
-    impl.FuncPtr = fp;
-    Desc = desc;
-  }
-};
-static void __HaviBlock__verifyBlock_block_func_0(struct __HaviBlock__verifyBlock_block_impl_0 *__cself, int a, int b) {
-  int age = __cself->age; // bound by copy
-  int *ageB = __cself->ageB; // bound by copy
-
-  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_2,a,b);
-  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_3,age );
-  NSLog((NSString *)&__NSConstantStringImpl__var_folders_82__00fdxvn217fjfl3my96zr0509801s_T_HaviBlock_be5fa6_mi_4,(*ageB));
- }
-
-static struct __HaviBlock__verifyBlock_block_desc_0 {
-  size_t reserved;
-  size_t Block_size;
-} __HaviBlock__verifyBlock_block_desc_0_DATA = { 0, sizeof(struct __HaviBlock__verifyBlock_block_impl_0)};
-
-static void _I_HaviBlock_verifyBlock(HaviBlock * self, SEL _cmd) {
- int age = 10;
- static int ageB = 11;
- void(*block)(int, int) = ((void (*)(int, int))&__HaviBlock__verifyBlock_block_impl_0((void *)__HaviBlock__verifyBlock_block_func_0, &__HaviBlock__verifyBlock_block_desc_0_DATA, age, &ageB));
- struct __main_block_impl_0 *blockStruct = (__bridge struct __main_block_impl_0 *)block;
- ((void (*)(__block_impl *, int, int))((__block_impl *)block)->FuncPtr)((__block_impl *)block, 3, 5);
-
+ void (*block)(void) = ((void (*)())&__Verify__block___createBlock_block_impl_0((void *)__Verify__block___createBlock_block_func_0, &__Verify__block___createBlock_block_desc_0_DATA, (__Block_byref_a_0 *)&a, 570425344));
+ ((void (*)(__block_impl *))((__block_impl *)block)->FuncPtr)((__block_impl *)block);
 }
 
 // @end
@@ -33331,20 +33291,19 @@ extern "C" __declspec(dllimport) struct objc_cache _objc_empty_cache;
 static struct /*_method_list_t*/ {
 	unsigned int entsize;  // sizeof(struct _objc_method)
 	unsigned int method_count;
-	struct _objc_method method_list[3];
-} _OBJC_$_INSTANCE_METHODS_HaviBlock __attribute__ ((used, section ("__DATA,__objc_const"))) = {
+	struct _objc_method method_list[2];
+} _OBJC_$_INSTANCE_METHODS_Verify__block_ __attribute__ ((used, section ("__DATA,__objc_const"))) = {
 	sizeof(_objc_method),
-	3,
-	{{(struct objc_selector *)"init", "@16@0:8", (void *)_I_HaviBlock_init},
-	{(struct objc_selector *)"createBlock", "v16@0:8", (void *)_I_HaviBlock_createBlock},
-	{(struct objc_selector *)"verifyBlock", "v16@0:8", (void *)_I_HaviBlock_verifyBlock}}
+	2,
+	{{(struct objc_selector *)"init", "@16@0:8", (void *)_I_Verify__block__init},
+	{(struct objc_selector *)"createBlock", "v16@0:8", (void *)_I_Verify__block__createBlock}}
 };
 
-static struct _class_ro_t _OBJC_METACLASS_RO_$_HaviBlock __attribute__ ((used, section ("__DATA,__objc_const"))) = {
+static struct _class_ro_t _OBJC_METACLASS_RO_$_Verify__block_ __attribute__ ((used, section ("__DATA,__objc_const"))) = {
 	1, sizeof(struct _class_t), sizeof(struct _class_t), 
 	(unsigned int)0, 
 	0, 
-	"HaviBlock",
+	"Verify__block_",
 	0, 
 	0, 
 	0, 
@@ -33352,12 +33311,12 @@ static struct _class_ro_t _OBJC_METACLASS_RO_$_HaviBlock __attribute__ ((used, s
 	0, 
 };
 
-static struct _class_ro_t _OBJC_CLASS_RO_$_HaviBlock __attribute__ ((used, section ("__DATA,__objc_const"))) = {
-	0, sizeof(struct HaviBlock_IMPL), sizeof(struct HaviBlock_IMPL), 
+static struct _class_ro_t _OBJC_CLASS_RO_$_Verify__block_ __attribute__ ((used, section ("__DATA,__objc_const"))) = {
+	0, sizeof(struct Verify__block__IMPL), sizeof(struct Verify__block__IMPL), 
 	(unsigned int)0, 
 	0, 
-	"HaviBlock",
-	(const struct _method_list_t *)&_OBJC_$_INSTANCE_METHODS_HaviBlock,
+	"Verify__block_",
+	(const struct _method_list_t *)&_OBJC_$_INSTANCE_METHODS_Verify__block_,
 	0, 
 	0, 
 	0, 
@@ -33366,36 +33325,36 @@ static struct _class_ro_t _OBJC_CLASS_RO_$_HaviBlock __attribute__ ((used, secti
 
 extern "C" __declspec(dllimport) struct _class_t OBJC_METACLASS_$_NSObject;
 
-extern "C" __declspec(dllexport) struct _class_t OBJC_METACLASS_$_HaviBlock __attribute__ ((used, section ("__DATA,__objc_data"))) = {
+extern "C" __declspec(dllexport) struct _class_t OBJC_METACLASS_$_Verify__block_ __attribute__ ((used, section ("__DATA,__objc_data"))) = {
 	0, // &OBJC_METACLASS_$_NSObject,
 	0, // &OBJC_METACLASS_$_NSObject,
 	0, // (void *)&_objc_empty_cache,
 	0, // unused, was (void *)&_objc_empty_vtable,
-	&_OBJC_METACLASS_RO_$_HaviBlock,
+	&_OBJC_METACLASS_RO_$_Verify__block_,
 };
 
 extern "C" __declspec(dllimport) struct _class_t OBJC_CLASS_$_NSObject;
 
-extern "C" __declspec(dllexport) struct _class_t OBJC_CLASS_$_HaviBlock __attribute__ ((used, section ("__DATA,__objc_data"))) = {
-	0, // &OBJC_METACLASS_$_HaviBlock,
+extern "C" __declspec(dllexport) struct _class_t OBJC_CLASS_$_Verify__block_ __attribute__ ((used, section ("__DATA,__objc_data"))) = {
+	0, // &OBJC_METACLASS_$_Verify__block_,
 	0, // &OBJC_CLASS_$_NSObject,
 	0, // (void *)&_objc_empty_cache,
 	0, // unused, was (void *)&_objc_empty_vtable,
-	&_OBJC_CLASS_RO_$_HaviBlock,
+	&_OBJC_CLASS_RO_$_Verify__block_,
 };
-static void OBJC_CLASS_SETUP_$_HaviBlock(void ) {
-	OBJC_METACLASS_$_HaviBlock.isa = &OBJC_METACLASS_$_NSObject;
-	OBJC_METACLASS_$_HaviBlock.superclass = &OBJC_METACLASS_$_NSObject;
-	OBJC_METACLASS_$_HaviBlock.cache = &_objc_empty_cache;
-	OBJC_CLASS_$_HaviBlock.isa = &OBJC_METACLASS_$_HaviBlock;
-	OBJC_CLASS_$_HaviBlock.superclass = &OBJC_CLASS_$_NSObject;
-	OBJC_CLASS_$_HaviBlock.cache = &_objc_empty_cache;
+static void OBJC_CLASS_SETUP_$_Verify__block_(void ) {
+	OBJC_METACLASS_$_Verify__block_.isa = &OBJC_METACLASS_$_NSObject;
+	OBJC_METACLASS_$_Verify__block_.superclass = &OBJC_METACLASS_$_NSObject;
+	OBJC_METACLASS_$_Verify__block_.cache = &_objc_empty_cache;
+	OBJC_CLASS_$_Verify__block_.isa = &OBJC_METACLASS_$_Verify__block_;
+	OBJC_CLASS_$_Verify__block_.superclass = &OBJC_CLASS_$_NSObject;
+	OBJC_CLASS_$_Verify__block_.cache = &_objc_empty_cache;
 }
 #pragma section(".objc_inithooks$B", long, read, write)
 __declspec(allocate(".objc_inithooks$B")) static void *OBJC_CLASS_SETUP[] = {
-	(void *)&OBJC_CLASS_SETUP_$_HaviBlock,
+	(void *)&OBJC_CLASS_SETUP_$_Verify__block_,
 };
 static struct _class_t *L_OBJC_LABEL_CLASS_$ [1] __attribute__((used, section ("__DATA, __objc_classlist,regular,no_dead_strip")))= {
-	&OBJC_CLASS_$_HaviBlock,
+	&OBJC_CLASS_$_Verify__block_,
 };
 static struct IMAGE_INFO { unsigned version; unsigned flag; } _OBJC_IMAGE_INFO = { 0, 2 };

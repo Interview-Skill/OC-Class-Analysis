@@ -13,7 +13,7 @@
 #import "Student.h"
 #import "RunLoopChildViewController.h"
 #import "CategoryStudent.h"
-#import "HaviBlock.h"
+#import "HaviNewBlock.h"
 
 @interface ViewController ()
 
@@ -86,7 +86,7 @@
 	[cperson run];
 	[self printClassMethod:[cperson class]];
 	
-	HaviBlock *block = [[HaviBlock alloc] init];
+	HaviNewBlock *block = [[HaviNewBlock alloc] init];
 }
 
 
@@ -119,6 +119,11 @@
 	[NSTimer scheduledTimerWithTimeInterval:3 repeats:NO block:^(NSTimer * _Nonnull timer) {
 		NSLog(@"timer begin");
 	}];
+	
+	PersonOne *p = [PersonOne new];
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		NSLog(@"p");
+	});
 }
 
 - (void)test
