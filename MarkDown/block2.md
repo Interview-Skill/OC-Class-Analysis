@@ -451,6 +451,14 @@ int main(int argc, const char * argv[]) {
 
 ## __block的内存管理
 
+之前说block捕获对象类型的时候，block中的__main_block_desc_0结构体中自动添加copy和dispose函数对捕获的变量进行内存管理。
+
+同样的，当block内部捕获使用__block修饰的对象类型的变量的时候，__Block_byref_person_0结构体内会自动添加[__Block_byref_id_object_copy]（)和[__Block_byref_id_object_dispose]对包装的对象进行内存管理。
+
+当block内存在栈上时，并不会对__block变量产生内存管理。只有当block被copy到堆上时才会调用block内部的copy函数，copy函数会调用_Block_aobject_assign函数，_Block_aobject_assign会对__block修饰的变量形成强引用（相当于retain）
+
+首先看下内存变化：
+![__block](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/block_m1.png)
 
 
 
