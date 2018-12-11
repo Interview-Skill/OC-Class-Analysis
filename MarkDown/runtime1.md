@@ -194,7 +194,7 @@ type只能为int，unsigned int，signed int，char, unsigned char 五种类型�
 
 
 ## 二、探寻Apple为什么使用共用体及其好处
-1. 模仿底层的做法：
+### 1. 模仿底层的做法：
 
 ```php
 @interface Person : NSObject
@@ -306,6 +306,99 @@ int main(int argc, const char * argv[]) {
 
 #### 3.如何设值？
 <strong>我们可以使用[|(按位或)]() | :按位或，只要有一个为1就是1，否则为0</strong>
+
+如果想将某一位设为1，那么将原来的值和掩码进行按位或进行操作即可，例如将tall设置为1：
+
+```php
+// 将倒数第三位 tall置为1
+  0000 0010  // _tallRichHandsome
+| 0000 0100  // TallMask
+------------
+  0000 0110 // 将tall置为1，其他位值都不变
+```
+
+如果想将某一位设为0，那么将掩码按位取反（~:按位取反）,然后在和原理的值进行按位取&操作。
+
+```php
+// 将倒数第二位 rich置为0
+  0000 0010  // _tallRichHandsome
+& 1111 1101  // RichMask按位取反
+------------
+  0000 0000 // 将rich置为0，其他位值都不变
+```
+具体我们的set方法：
+
+```php
+- (void)setTall:(BOOL)tall
+{
+	if (tall) {//如果设置值为1，只需要进行按位取或。
+		_tallRichHandsome |= TallMask;
+	} else {
+		//如果需要将值设置为0，需要先取反，然后进行按位取与
+		_tallRichHandsome &= ~TallMask;
+	}
+}
+
+- (void)setRich:(BOOL)rich
+{
+	if (rich) {
+		_tallRichHandsome |= RichMask;
+	} else {
+		_tallRichHandsome &= ~RichMask;
+	}
+}
+
+- (void)setHandsome:(BOOL)handsome
+{
+	if (handsome) {
+		_tallRichHandsome |= HandsomeMask;
+	} else {
+		_tallRichHandsome &= ~HandsomeMask;
+	}
+}
+
+```
+下面我们可以通过调用来：
+
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Person *person  = [[Person alloc] init];
+        person.tall = YES;
+        person.rich = NO;
+        person.handsome = YES;
+        NSLog(@"tall : %d, rich : %d, handsome : %d", person.tall,person.rich,person.handsome);
+    }
+    return 0;
+}
+```
+
+打印结果：
+```php
+Runtime - union探寻[58212:3857728] tall : 1, rich : 0, handsome : 1
+```
+这样就自己实现了位域的功能；下面我们使用位域来优化：
+
+### 2.使用结构体位域
+位域声明 [位域名：位域长度]()
+> 1. 如果一个字节剩余的空间不够存放另一个位域的时候，应当从下一个字节单元开始存放该位域。也就是说可以有意使得某个位域从下一个单元开始。<br>
+2. 位域的长度不能大于数据类型本身的长度。比如int类型不能超过32位二进制位。<br>
+3. 位域可以无位域名，这时它只作为填充或者调整位置使用。无名的位域是无法使用的。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
