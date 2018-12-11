@@ -234,11 +234,78 @@ int main(int argc, const char * argv[]) {
 }
 ```
 例如<strong>_tallRichHandsome的值为 0b 0000 0010</strong>那么只是用二进制位的后三位表示，分别为其赋值0或者1来代表tall,rich,handsome的值。
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa1.png)
 
 #### 2.如何取值
+那么我们如何去8个二进制中的某一位或者给其中的一位进行赋值呢？
 
+我们可以使用按位与取出响应位置的值。
+<strong>&: 按位与，同真为真，其他未假</strong>
+```php
+// 示例
+// 取出倒数第三位 tall
+  0000 0010
+& 0000 0100
+------------
+  0000 0000  // 取出倒数第三位的值为0，其他位都置为0
 
+// 取出倒数第二位 rich
+  0000 0010
+& 0000 0010
+------------
+  0000 0010 // 取出倒数第二位的值为1，其他位都置为0
 
+```
+
+按位与可以取出特定的bit位，只需要将取出的bit位设置为1,其他位设定为0.
+
+对上面的代码进行优化：
+```php
+#define TallMask 0b00000100
+#define RichMask 0b00000010
+#define HandsomeMask 0b00000001
+
+- (BOOL)isTall
+{
+	return !!(_tallRichHandsome & TallMask);
+}
+
+- (BOOL)isRich
+{
+	return  !!(_tallRichHandsome & RichMask);
+}
+
+- (BOOL)isHandsome
+{
+	return !!(_tallRichHandsome & HandsomeMask);
+}
+```
+在上面的代码中使用!!来讲二进制数转化为bool类型。
+
+```php
+// 取出倒数第二位 rich
+  0000 0010  // _tallRichHandsome
+& 0000 0010 // RichMask
+------------
+  0000 0010 // 取出rich的值为1，其他位都置为0
+```
+上面代码中[__tallrichHandsome & TallMask]()的值是[0b00000010]也就是2.但是我们需要一个bool值类型，那么!!2会将2先转化为0然后转化为1.相反按位与之后值0同样需要!!0转化。
+
+‼️<strong>上面代码中定义了三个宏，用来分别进行按位与运算而取出响应的值，一般用来和按位与&运算的值成为掩码。</strong>
+
+为了能更清晰的表示掩码是为了取出哪一位，上面的三个宏可以使用[<<](左移)来优化。
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa2.png)
+
+优化后：
+```php
+#define TallMask 1<<2 //0b0000 0100 = 4
+#define RichMask 1<<1 //0b0000 0010 = 2
+#define HandsomeMask 1<<0 //0
+```
+
+#### 3.如何设值？
+<strong>我们可以使用[|(按位或)]() | :按位或，只要有一个为1就是1，否则为0</strong>
 
 
 
