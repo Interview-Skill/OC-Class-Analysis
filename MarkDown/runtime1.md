@@ -194,6 +194,45 @@ type只能为int，unsigned int，signed int，char, unsigned char 五种类型�
 
 
 ## 二、探寻Apple为什么使用共用体及其好处
+1. 模仿底层的做法：
+
+```php
+@interface Person : NSObject
+
+@property (nonatomic, assign, getter=isTall) BOOL tall;
+@property (nonatomic, assign, getter=isRich) BOOL rich;
+@property (nonatomic, assign, getter=isHansome) BOOL handsome;
+
+@end
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        NSLog(@"%zd", class_getInstanceSize([Person class]));
+    }
+    return 0;
+}
+// 打印内容
+// Runtime - [52235:3160607] 16
+
+```
+上面的代码中Person含有3个bool值，打印person类对象占据的内存空间为16字节，也就是[(isa指针 = 8)+ (Bool tall = 1) + (Bool rich = 1) + (bool handsome = 1) = 13]().由于内存对齐原则是16.
+
+上面提到共用体中的变量可以相互覆盖，可以使不同的变量存放在一段内存中，可以节省内存空间。
+
+而B
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
