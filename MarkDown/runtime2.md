@@ -220,8 +220,48 @@ ro = (const class_ro_t *)cls->data();可以看出类的初始信息其实本来�
 
 # Class_rw_t中如何存储方法的
 
-## 
-# Class_rw_t中如何存储方法的
+## method_t
+
+我们知道在method_array_t最终存储的是method_t，method_t是对方法函数的封装，每一个方法对象就是一个method_t.通过源码来查看method_t结构：
+
+```php
+struct method_t {
+    SEL name;
+    const char *types;
+    IMP imp;
+
+    struct SortBySELAddress :
+        public std::binary_function<const method_t&,
+                                    const method_t&, bool>
+    {
+        bool operator() (const method_t& lhs,
+                         const method_t& rhs)
+        { return lhs.name < rhs.name; }
+    };
+};
+```
+### 1.SEL
+
+SEL代表方法/函数名，一般叫做选择器，底层结构跟char* 类似,typedef struct objc_selector * SEL,可以把SEL看做是方法名字符串。
+
+```php
+typedef struct objc_selector *SEL;
+
+猜测,runtime源码没有
+struct objc_selector  {
+    char name[64 or ...];
+    ...
+};
+
+```
+
+SEL可以通过@selector()和sel_registerName()获得
+
+```php
+SEL sel1 = @selector(test);
+SEL sel2 = sel_registerName("test");
+```
+
 
 
 
