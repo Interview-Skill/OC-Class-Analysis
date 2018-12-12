@@ -373,6 +373,7 @@ int main(int argc, const char * argv[]) {
 
 ```
 首先打个断点：查看
+
 ![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa3.png)
 
 因为_tallRichHandsome占据一个内存空间，也就是8个bits,我们将05十六进制转化为二进制：
@@ -454,6 +455,8 @@ Runtime - union探寻[59366:4053478] tall : 1, rich : 0, handsome : 1
 
 并且在set和get方法中并没有用到结构体，结构体的作用仅仅说明了共用体中存储的值，以及这些值栈用的位空间。同时取值使用了位运算来增加效率，存储使用共用体，，存放的位置依然通过掩码进行位运算控制。
 
+*****
+
 ## isa_t源码
 
 ```php
@@ -502,6 +505,95 @@ union isa_t
 ```
 
 上面的源码使用共用体存储了64位的值，这些值在结构体中被展示出来，占的二进制位，通过对bits进行位运算获取响应位置的值。
+
+#### ‼️重点：[shiftcls](),shiftcls中存储着存储着Class/Meta-Class对象的内存地址信息，我们之前知道，对象的isa指针需要和ISA_MASK进行一次&才能得出Class真正的Class对象的地址。
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa-mask.png)
+
+下面我们查看ISA_MASK的值：[0x0000000ffffffff8]()：
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa-mask-bits.png)
+
+可以看到ISA_MASK转换为二进制后有33位都是1，所以使用按位与可以取出这33位中的值，因此按位与取出的就是Class或Meta-Class的值。同时可以看出ISA_MASK后三位是0，因此进行按位与之后得到的后三位必定为0，因此任何类对象的内存地址的最后三位转换为十六进制后最后一位必定为8或者0.
+
+## isa中存储的信息及作用：
+
+首先看下这个表：
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/isa-bits.jpg)
+
+对应的isa源代码：
+```php
+struct {
+    // 0代表普通的指针，存储着Class，Meta-Class对象的内存地址。
+    // 1代表优化后的使用位域存储更多的信息。
+    uintptr_t nonpointer        : 1; 
+
+   // 是否有设置过关联对象，如果没有，释放时会更快
+    uintptr_t has_assoc         : 1;
+
+    // 是否有C++析构函数，如果没有，释放时会更快
+    uintptr_t has_cxx_dtor      : 1;
+
+    // 存储着Class、Meta-Class对象的内存地址信息
+    uintptr_t shiftcls          : 33; 
+
+    // 用于在调试时分辨对象是否未完成初始化
+    uintptr_t magic             : 6;
+
+    // 是否有被弱引用指向过。
+    uintptr_t weakly_referenced : 1;
+
+    // 对象是否正在释放
+    uintptr_t deallocating      : 1;
+
+    // 引用计数器是否过大无法存储在isa中
+    // 如果为1，那么引用计数会存储在一个叫SideTable的类的属性中
+    uintptr_t has_sidetable_rc  : 1;
+
+    // 里面存储的值是引用计数器减1
+    uintptr_t extra_rc          : 19;
+};
+
+```
+
+### 验证各个位上的信息及作用
+
+```php
+// 以下代码需要在真机中运行，因为真机中才是__arm64__ 位架构
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    Person *person = [[Person alloc] init];
+    NSLog(@"%p",[person class]);
+    NSLog(@"%@",person);
+}
+
+```
+
+1.首先获取person 类对象的地址，然后通过断点打印person对象的isa指针地址。
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/verify-isa1.png)
+
+将类对象的地址转化为二进制：
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/verify-isa2.png)
+
+将person的isa指针转化为二级制：
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/verify-isa3.png)
+
+<strong>shiftcls</strong> shiftcls中存储类对象的地址，通过上面类对象地址和isa地址中的33位二进制内容完全符合。<br>
+<strong>extra_rc</strong> extra_rc的19位存储的值为引用计数，如果为1，那么person的引用计数为1，此时为0,表示person没有引用。<br>
+<strong>magic</strong> magic中存储的6位用于分辨对象对象是否初始化完成。上述代码的person初始化完成，那么此时这6位二进制中存储的值011010就是宏
+
+```php
+#   define ISA_MAGIC_VALUE 0x000001a000000001ULL
+```
+<strong>nonpointer</strong>这里肯定使用的是优化后的isa，因此nonpointer的值肯定为1.
+
+因为此时person的对象没有关联对象并且
+
+
+
 
 
 
