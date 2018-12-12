@@ -590,7 +590,53 @@ struct {
 ```
 <strong>nonpointer</strong>这里肯定使用的是优化后的isa，因此nonpointer的值肯定为1.
 
-因为此时person的对象没有关联对象并且
+因为此时person的对象没有关联对象并且没有弱指针引用过，可以看出[has_assoc]()和[weak_referenced]()的值都是0，下面我们为person添加弱引用和关联对象，来观察下[has_assoc]()和[weak_referenced]()的值的变化。
+
+```php
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    Person *person = [[Person alloc] init];
+    NSLog(@"%p",[person class]);
+    // 为person添加弱引用
+    __weak Person *weakPerson = person;
+    // 为person添加关联对象
+    objc_setAssociatedObject(person, @"name", @"xx_cc", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSLog(@"%@",person);
+}
+
+```
+
+重新打印person的isa指针地址将其转换为二进制，可以看到[has_assoc]()和[weak_referenced]()的值都是1.
+
+![isa](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/verify-isa4.png)
+
+### ⚠️只要设置过关联对象和弱引用，对象的[has_assoc]()和[weak_referenced]()的值就是1，不论之后对象的关联对象是否设置为nil或者弱引用是否断开.
+
+如果没有设置过关联对象，对象在释放的时候会更快，这是因为对象在销毁的时候会判断是否有关联对象，然后对关联对象进行释放。看下面的销毁代码：
+
+```php
+void *objc_destructInstance(id obj) 
+{
+    if (obj) {
+        Class isa = obj->getIsa();
+        // 是否有c++析构函数
+        if (isa->hasCxxDtor()) {
+            object_cxxDestruct(obj);
+        }
+        // 是否有关联对象，如果有则移除
+        if (isa->instancesHaveAssociatedObjects()) {
+            _object_remove_assocations(obj);
+        }
+        objc_clear_deallocating(obj);
+    }
+    return obj;
+}
+
+```
+
+相信至此我们已经对isa指针有了新的认识，__arm64__架构之后，isa指针不单单只存储了Class或Meta-Class的地址，而是使用共用体的方式存储了更多信息，其中shiftcls存储了Class或Meta-Class的地址，需要同ISA_MASK进行按位&运算才可以取出其内存地址值。
+
+
 
 
 
