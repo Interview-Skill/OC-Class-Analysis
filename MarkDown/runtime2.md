@@ -21,7 +21,6 @@ struct objc_class : objc_object {
 class_rw_t* data() {
         return (class_rw_t *)(bits & FAST_DATA_MASK);
 }
-
 ```
 
 ## class_rw_t
@@ -71,8 +70,8 @@ struct class_rw_t {
         } while (!OSAtomicCompareAndSwap32Barrier(oldf, newf, (volatile int32_t *)&flags));
     }
 };
-
 ```
+
 上面的代码中，[method_array_t、property_array_t、protocol_array_t]()其实都是二维数组，进到method_array_t, property_array_t, protocol_array_t 内部看一下。这里以 method_array_t为例，method_array_t 本身就是一个数组，数组里面存放的是数组method_list_t, method_list_t里面存放的是method_t.
 
 ```php
@@ -100,7 +99,7 @@ class method_array_t :
     method_list_t **beginCategoryMethodLists() {
         return beginLists();
     }
-    
+
     method_list_t **endCategoryMethodLists(Class cls);
 
     method_array_t duplicate() {
@@ -132,6 +131,7 @@ class protocol_array_t :
     }
 };
 ```
+
 class_rw_t里面的methods/properties/protocols是二维数组，是可读可写的，其中包含了类的初始化内容以及分类的内容。
 
 ![array](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/method-array-t.png)
@@ -150,7 +150,7 @@ struct class_ro_t {
 #endif
 
     const uint8_t * ivarLayout;
-    
+
     const char * name;
     method_list_t * baseMethodList;
     protocol_list_t * baseProtocols;
@@ -168,6 +168,7 @@ struct class_ro_t {
 从源码中看出，class_ro_t *ro是只读的，内部直接存储的就是 method_list_t,protocol_list_t,property_list_t 类型的一维数组，数组里面分别存放的是类的初始信息，以 method_list_t 为例，里面存放的就是method_t,但是是只读的.
 
 ### ‼️总结
+
 class_tw_t中methods是一个二维数组的结构，并且可读可写，因此可以动态的添加方法，因此更加便利分类方法的添加。在category原理中我们知道，attachList 函数通过 memmove 和 memcpy 两个操作将分类的方法列表合并到本类的方法列表中。在此时就将分类的方法和本类的方法整合到一起。
 
 其实从一开始类的方法，属性，成员变量和协议列表都是存放在class_ro_t中的，当程序运行的时候，需要将分类中的列表跟类的初始化的列表合并在一起，就会将class_rw_t中的列表和分类中的列表合并之后存放到class_rw_t中，也就是说class_rw_t中的部分列表是从class_ro_t中取出来的。并且最终和分类进行合并。
@@ -214,9 +215,10 @@ static Class realizeClass(Class cls)
     ....
 }
 ```
+
 ro = (const class_ro_t *)cls->data();可以看出类的初始信息其实本来是存储在 class_ro_t中的，并且ro本来是指向cls->data()，也就是bits.data()得到的是ro.但是在运行过程中创建了 class_rw_t，并且将cls->data指向 rw，同时将初始信息ro赋值给rw中的ro。最后通过setData(rw)设置data。那么此时bits.data()得到的就是rw,之后再去检查是否有分类，同时将分类的方法，属性，协议列表整合存储在class_rw_t的方法，属性，及协议列表中。
 
-*****
+---
 
 # Class_rw_t中如何存储方法的
 
@@ -240,6 +242,7 @@ struct method_t {
     };
 };
 ```
+
 ### 1.SEL
 
 SEL代表方法/函数名，一般叫做选择器，底层结构跟char* 类似,typedef struct objc_selector * SEL,可以把SEL看做是方法名字符串。
@@ -252,7 +255,6 @@ struct objc_selector  {
     char name[64 or ...];
     ...
 };
-
 ```
 
 SEL可以通过@selector()和sel_registerName()获得
@@ -262,8 +264,4 @@ SEL sel1 = @selector(test);
 SEL sel2 = sel_registerName("test");
 ```
 
-
-
-
-
-
+也可以通过**sel_getName**
