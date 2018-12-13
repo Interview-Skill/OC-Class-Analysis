@@ -35,7 +35,11 @@
 //	if (class_isMetaClass(meta_class1)) {
 //		NSLog(@"is meta-class");
 //	}
+	SEL sel1 = @selector(test);
+	SEL sel2 = sel_registerName("test");
 	
+	char *string = sel_getName(sel1);
+	NSString *string2 = NSStringFromSelector(sel2);
 	
 }
 @end

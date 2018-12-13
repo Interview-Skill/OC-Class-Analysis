@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "566016785.184991"
+            timestampString = "566311975.441287"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "71"
-            endingLineNumber = "71"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
             landmarkName = "-viewDidLoad"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "566016785.185077"
+            timestampString = "566311975.441764"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "64"
-            endingLineNumber = "64"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "-viewDidLoad"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "566016785.185138"
+            timestampString = "566311975.442111"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "98"
-            endingLineNumber = "98"
+            startingLineNumber = "135"
+            endingLineNumber = "135"
             landmarkName = "ViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "566016785.1851929"
+            timestampString = "566311975.442452"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "128"
-            endingLineNumber = "128"
+            startingLineNumber = "165"
+            endingLineNumber = "165"
             landmarkName = "ViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
-            timestampString = "566016785.185249"
+            timestampString = "566311975.442714"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "117"
-            endingLineNumber = "117"
+            startingLineNumber = "154"
+            endingLineNumber = "154"
             landmarkName = "-touchesBegan:withEvent:"
             landmarkType = "7">
          </BreakpointContent>
@@ -122,7 +122,7 @@
                   moduleName = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/hli7/Desktop/Demo/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/Block/Verify__block_.m"
-                  timestampString = "566016768.256678"
+                  timestampString = "566311975.599925"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "26"
@@ -137,7 +137,7 @@
                   moduleName = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/hli7/Desktop/Demo/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/Block/Verify__block_.m"
-                  timestampString = "566016768.258616"
+                  timestampString = "566311975.602716"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "26"
@@ -152,7 +152,7 @@
                   moduleName = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/hli7/Desktop/Demo/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/iOS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E6%80%BB%E7%BB%93/Block/Verify__block_.m"
-                  timestampString = "566016768.2604769"
+                  timestampString = "566311975.605167"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "26"
@@ -160,6 +160,70 @@
                   offsetFromSymbolStart = "17">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/Block/HaviNewBlock.m"
+            timestampString = "566139950.877678"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
+            landmarkName = "-verifyBlock"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
+            timestampString = "566311975.443079"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "-viewDidLoad"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
+            timestampString = "566311975.4434251"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
+            landmarkName = "-viewDidLoad"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "iOS&#x5e95;&#x5c42;&#x539f;&#x7406;&#x603b;&#x7ed3;/ViewController.m"
+            timestampString = "566311975.443745"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "-viewDidLoad"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

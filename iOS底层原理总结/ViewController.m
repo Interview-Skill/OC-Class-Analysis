@@ -14,6 +14,23 @@
 #import "RunLoopChildViewController.h"
 #import "CategoryStudent.h"
 #import "HaviNewBlock.h"
+#import "Person.h"
+
+struct HGBitFiled {
+	uintptr_t tall:1;
+	uintptr_t rich:2;
+	uintptr_t handsome:3;
+};
+
+union HGUnion {
+	int info;
+	char bits;
+	struct HGFiled {
+		uintptr_t tall:1;
+		uintptr_t rich:2;
+		uintptr_t handsome:3;
+	};
+};
 
 @interface ViewController ()
 
@@ -22,7 +39,27 @@
 @implementation ViewController
 
 - (void)viewDidLoad {
+	
+//	UITableView
 	[super viewDidLoad];
+	
+	Person *personone = [[Person alloc] init];
+	personone.tall = YES;
+	personone.rich = NO;
+	personone.handsome = YES;
+	
+	NSLog(@"tall: %d, rich:%d, handsome:%d",personone.tall, personone.rich, personone.handsome);
+	struct HGBitFiled bf;
+	bf.tall = 2;
+	bf.rich = 1;
+	bf.handsome = 4;
+	
+	union HGUnion u;
+	u.info = 301;
+	
+	NSLog(@"%d",bf.tall);
+	
+	
 	RunLoopChildViewController *vc = [RunLoopChildViewController new];
 	[self addChildViewController:vc];
 	[self.view addSubview:vc.view];
