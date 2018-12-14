@@ -296,6 +296,72 @@ class_rw_t *data = cls->data();
 
 ![types](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime2-1.png)
 
+从上图中我们可以看出：**types**的值为[v16@0:8](),那么这个值代表什么？apple有一个详细的对照表：
+
+![types](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime2-2.png)
+
+我们将types的值和表进行一一对应：
+
+```php
+- (void) test;
+
+ v    16      @     0     :     8
+void         id          SEL
+// 16表示参数的占用空间大小，id后面跟的0表示从0位开始存储，id占8位空间。
+// SEL后面的8表示从第8位开始存储，SEL同样占8位空间
+```
+
+我们知道任何方法都有两个默认的参数：**id类型的self**和**SEL类型的_cmd**,下面我们为test方法添加参数和返回值：
+
+![back](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime2-3.png)
+
+同样我们根据表进行一个对应：
+
+```php
+- (int)testWithAge:(int)age Height:(float)height
+{
+    return 0;
+}
+  i    24    @    0    :    8    i    16    f    20
+int         id        SEL       int        float
+// 参数的总占用空间为 8 + 8 + 4 + 4 = 24
+// id 从第0位开始占据8位空间
+// SEL 从第8位开始占据8位空间
+// int 从第16位开始占据4位空间
+// float 从第20位开始占据4位空间
+```
+
+⚠️iOS提供了[@encode]()指令，可以将具体的类型转化为字符串编码：
+
+```
+NSLog(@"%s",@encode(int));
+NSLog(@"%s",@encode(float));
+NSLog(@"%s",@encode(id));
+NSLog(@"%s",@encode(SEL));
+
+// 打印内容
+Runtime-test[25275:9144176] i
+Runtime-test[25275:9144176] f
+Runtime-test[25275:9144176] @
+Runtime-test[25275:9144176] :
+```
+
+### 3. IMP
+
+[IMP]()代表了函数的具体实现，存储的内容是`函数地址`。也就是说找到`imp`就可以找到函数实现，进而对函数实现调用。
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
