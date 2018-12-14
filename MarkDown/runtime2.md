@@ -264,4 +264,116 @@ SEL sel1 = @selector(test);
 SEL sel2 = sel_registerName("test");
 ```
 
-也可以通过**sel_getName**
+也可以通过**sel_getName**和**NSStringFromSelector**将SEL转换为字符串
+
+```php
+char *string = sel_getName(sel1);
+NSString *string2 = NSStringFromSelector(sel2);
+```
+
+不同类中相同名字的方法，所对应的方法选择器是相同的。
+
+```php
+NSLog(@"%p,%p", sel1,sel2);
+Runtime-test[23738:8888825] 0x1017718a3,0x1017718a3
+```
+
+**⚠️SEL仅仅代表方法的名字，并且不同类中相同的方法名的SEL是全局唯一的**
+
+### 2.types
+
+**types**包含了函数返回值，参数编码的字符串。通过字符串拼接的方式将返回值和参数拼接成了一个字符串，来代表函数返回值和参数。
+
+我们通过代码来检查下types是如何代表函数及返回值的，首先通过模拟Class的内部实现，通过强制转换：
+
+```php
+Person *person = [[Person alloc] init];
+xx_objc_class *cls = (__bridge xx_objc_class *)[Person class];
+class_rw_t *data = cls->data();
+```
+
+通过断点查看types具体内容：
+
+![types](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime2-1.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
