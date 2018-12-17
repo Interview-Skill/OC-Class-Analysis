@@ -1,5 +1,10 @@
 # 1.方法调用本质
 
+首先我们通过一段代码来看看方法调用转为C++是什么样子：
+```php
+xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m
+```
+
 # 2.消息发送
 
 ## 1）方法查找
