@@ -41,64 +41,63 @@ xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m
  ********************************************************************/
 
 #if SUPPORT_TAGGED_POINTERS
-	.data
-	.align 3
-	.globl _objc_debug_taggedpointer_classes
+    .data
+    .align 3
+    .globl _objc_debug_taggedpointer_classes
 _objc_debug_taggedpointer_classes:
-	.fill 16, 8, 0
-	.globl _objc_debug_taggedpointer_ext_classes
+    .fill 16, 8, 0
+    .globl _objc_debug_taggedpointer_ext_classes
 _objc_debug_taggedpointer_ext_classes:
-	.fill 256, 8, 0
+    .fill 256, 8, 0
 #endif
 
-	ENTRY _objc_msgSend
-	UNWIND _objc_msgSend, NoFrame
+    ENTRY _objc_msgSend
+    UNWIND _objc_msgSend, NoFrame
 
-	cmp	p0, #0			// nil check and tagged pointer check
+    cmp    p0, #0            // nil check and tagged pointer check
 #if SUPPORT_TAGGED_POINTERS
-	b.le	LNilOrTagged		//  (MSB tagged pointer looks negative)
+    b.le    LNilOrTagged        //  (MSB tagged pointer looks negative)
 #else
-	b.eq	LReturnZero
+    b.eq    LReturnZero
 #endif
-	ldr	p13, [x0]		// p13 = isa
-	GetClassFromIsa_p16 p13		// p16 = class
+    ldr    p13, [x0]        // p13 = isa
+    GetClassFromIsa_p16 p13        // p16 = class
 LGetIsaDone:
-	CacheLookup NORMAL		// calls imp or objc_msgSend_uncached
+    CacheLookup NORMAL        // calls imp or objc_msgSend_uncached
 
 #if SUPPORT_TAGGED_POINTERS
 LNilOrTagged:
-	b.eq	LReturnZero		// nil check
+    b.eq    LReturnZero        // nil check
 
-	// tagged
-	adrp	x10, _objc_debug_taggedpointer_classes@PAGE
-	add	x10, x10, _objc_debug_taggedpointer_classes@PAGEOFF
-	ubfx	x11, x0, #60, #4
-	ldr	x16, [x10, x11, LSL #3]
-	adrp	x10, _OBJC_CLASS_$___NSUnrecognizedTaggedPointer@PAGE
-	add	x10, x10, _OBJC_CLASS_$___NSUnrecognizedTaggedPointer@PAGEOFF
-	cmp	x10, x16
-	b.ne	LGetIsaDone
+    // tagged
+    adrp    x10, _objc_debug_taggedpointer_classes@PAGE
+    add    x10, x10, _objc_debug_taggedpointer_classes@PAGEOFF
+    ubfx    x11, x0, #60, #4
+    ldr    x16, [x10, x11, LSL #3]
+    adrp    x10, _OBJC_CLASS_$___NSUnrecognizedTaggedPointer@PAGE
+    add    x10, x10, _OBJC_CLASS_$___NSUnrecognizedTaggedPointer@PAGEOFF
+    cmp    x10, x16
+    b.ne    LGetIsaDone
 
-	// ext tagged
-	adrp	x10, _objc_debug_taggedpointer_ext_classes@PAGE
-	add	x10, x10, _objc_debug_taggedpointer_ext_classes@PAGEOFF
-	ubfx	x11, x0, #52, #8
-	ldr	x16, [x10, x11, LSL #3]
-	b	LGetIsaDone
+    // ext tagged
+    adrp    x10, _objc_debug_taggedpointer_ext_classes@PAGE
+    add    x10, x10, _objc_debug_taggedpointer_ext_classes@PAGEOFF
+    ubfx    x11, x0, #52, #8
+    ldr    x16, [x10, x11, LSL #3]
+    b    LGetIsaDone
 // SUPPORT_TAGGED_POINTERS
 #endif
 
 LReturnZero:
-	// x0 is already zero
-	mov	x1, #0
-	movi	d0, #0
-	movi	d1, #0
-	movi	d2, #0
-	movi	d3, #0
-	ret
+    // x0 is already zero
+    mov    x1, #0
+    movi    d0, #0
+    movi    d1, #0
+    movi    d2, #0
+    movi    d3, #0
+    ret
 
-	END_ENTRY _objc_msgSend
-
+    END_ENTRY _objc_msgSend
 ```
 
 上面的代码会首先判断消息接受者`receiver`的值。如果传入的消息接收者为`nil`则会执行`LNilOrTagged`,`LNilOrTagged`内部则会执行`LReturnZero`，而在`LRetureZero`内部则直接return0。
@@ -186,7 +185,7 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
         // from the messenger then it won't happen. 2778172
     }
 
-    
+
  retry:    
     runtimeLock.assertLocked();
 
@@ -216,7 +215,7 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
             if (--attempts == 0) {
                 _objc_fatal("Memory corruption in class list.");
             }
-            
+
             // Superclass cache.
             imp = cache_getImp(curClass, sel);
             if (imp) {
@@ -232,7 +231,7 @@ IMP lookUpImpOrForward(Class cls, SEL sel, id inst,
                     break;
                 }
             }
-            
+
             // Superclass method list.
             Method meth = getMethodNoSuper_nolock(curClass, sel);
             if (meth) {
@@ -350,7 +349,7 @@ static method_t *findMethodInSortedMethodList(SEL key, const method_list_t *list
             count--;
         }
     }
-    
+
     return nil;
 }
 ```
@@ -411,8 +410,6 @@ void _class_resolveMethod(Class cls, SEL sel, id inst)
 
 上面的代码可以知道，动态解析之后，会把`triedResolver = YES`,那么下次的时候就不会再进行动态解析了，之后会进行`retry`把方法查找流程重走一遍。也就是无论动态解析是否成功，`retry`之后都不会再进行动态解析了。
 
-
-
 ### 3) 如何动态解析方法
 
 1. **动态解析对象方法：**使用`+(BOOL)resolveInstanceMethod:(SEL)sel`
@@ -435,14 +432,14 @@ void _class_resolveMethod(Class cls, SEL sel, id inst)
     if (sel == @selector(test)) {
         // 获取其他方法 指向method_t的指针
         Method otherMethod = class_getInstanceMethod(self, @selector(other));
-        
+
         // 动态添加test方法的实现
         class_addMethod(self, sel, method_getImplementation(otherMethod), method_getTypeEncoding(otherMethod));
-        
+
         // 返回YES表示有动态添加方法
         return YES;
     }
-    
+
     NSLog(@"%s", __func__);
     return [super resolveInstanceMethod:sel];
 }
@@ -466,8 +463,6 @@ int main(int argc, const char * argv[]) {
 
 ⚠️这里需要注意`class_addMethod`用来向具有给定名称和实现的类添加新方法，`class_addMethod`将添加一个方法实现的覆盖，但是不会替换已有的实现。也就是说如果上述代码中已经实现了`-(void)test`方法，则不会再动态添加方法，这点在上述源码中也可以体现，因为一旦找到方法实现就直接return imp并调用方法了，不会再执行动态解析方法了。
 
-
-
 `class_addMethod函数`
 
 首先来看下`class_addMethod`参数意义：
@@ -480,7 +475,6 @@ int main(int argc, const char * argv[]) {
      第四个参数： types :方法类型，需要用特定符号，参考API
      */
 class_addMethod(__unsafe_unretained Class cls, SEL name, IMP imp, const char *types)
-
 ```
 
 需要注意的是在上面的代码中`class_getInstanceMethod`获取`Method`的方法：
@@ -509,16 +503,16 @@ struct method_t {
     if (sel == @selector(test)) {
         // Method强转为method_t
         struct method_t *method = (struct method_t *)class_getInstanceMethod(self, @selector(other));
-        
+
         NSLog(@"%s,%p,%s",method->sel,method->imp,method->types);
-        
+
         // 动态添加test方法的实现
         class_addMethod(self, sel, method->imp, method->types);
-        
+
         // 返回YES表示有动态添加方法
         return YES;
     }
-    
+
     NSLog(@"%s", __func__);
     return [super resolveInstanceMethod:sel];
 }
@@ -552,9 +546,173 @@ void cook(id self ,SEL _cmd,id Num)
 
 #### 2. 动态解析类方法
 
+动态解析类方法的时候，就会调用`+(BOOL)resolvedClassMethod:(SEL)sel`函数，而我们知道类方法时存在元类对象里，因此`cls`第一个对象需要传入远元类对象：
+
+```php
+void other(id self, SEL _cmd)
+{
+    NSLog(@"other - %@ - %@", self, NSStringFromSelector(_cmd));
+}
+
++ (BOOL)resolveClassMethod:(SEL)sel
+{
+    if (sel == @selector(test)) {
+        // 第一个参数是object_getClass(self)，传入元类对象。
+        class_addMethod(object_getClass(self), sel, (IMP)other, "v16@0:8");
+        return YES;
+    }
+    return [super resolveClassMethod:sel];
+}
+```
+
+在上面的源码中，我们无论是否实现了动态解析的方法，系统内部都会执行`retry`对方法进行再次查找，那么如果我们实现了动态解析方法，此时就会顺利找到方法，进而返回方法`imp`进行调用。如果没有实现动态解析方法，就会进行消息转发。
+
+![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime3-3.png)
+
 
 
 # 3.消息转发
+
+如果我们没有对方法进行动态解析，就会进行消息转发：
+
+```php
+imp = (IMP)_objc_msgForward_impcache;
+cache_fill(cls, sel, imp, inst);
+```
+
+自己没有能力处理这个消息的时候，就会进行消息转发阶段，会调用`_objc_msgForward_impcache`函数。
+
+通过搜索找到`_objc_msgForward_impcache`函数实现，`_objc_msgForward_impcache`函数中调用了`_objc_msgForward`进而找到`_objc_forward_handler`.
+
+```php
+STATIC_ENTRY __objc_msgForward_impcache
+	// No stret specialization.
+b	__objc_msgForward
+END_ENTRY __objc_msgForward_impcache
+
+ENTRY __objc_msgForward
+
+adrp	x17, __objc_forward_handler@PAGE
+ldr	p17, [x17, __objc_forward_handler@PAGEOFF]
+TailCallFunctionPointer x17
+	
+END_ENTRY __objc_msgForward
+
+// Default forward handler halts the process.
+__attribute__((noreturn)) void 
+objc_defaultForwardHandler(id self, SEL sel)
+{
+    _objc_fatal("%c[%s %s]: unrecognized selector sent to instance %p "
+                "(no message forward handler is installed)", 
+                class_isMetaClass(object_getClass(self)) ? '+' : '-', 
+                object_getClassName(self), sel_getName(sel), self);
+}
+void *_objc_forward_handler = (void*)objc_defaultForwardHandler;
+```
+
+最后发现并没有什么实质性的东西。
+
+⚠️其实消息转发机制是不开源的，但是我们可以猜测其中有可能是拿到返回的对象调用了`objc_msgSend`，
+
+重新走了一遍消息发送，动态解析，消息转发，最后找到方法进行调用。
+
+
+
+ 下面通过代码，首先创建`Car`类继承自`NSObject`,并且`Car`有一个`-(void)driving`方法，当`person`类实例对象失去了驾车的能力的时候，并且没有再开车过程中动态的学会驾车，那么此时只能讲开车的消息转发给`car`，并且由`car`的实例对象来来帮助`person`对象驾车。
+
+```php
+#import "Car.h"
+@implementation Car
+- (void) driving
+{
+    NSLog(@"car driving");
+}
+@end
+
+--------------
+
+#import "Person.h"
+#import <objc/runtime.h>
+#import "Car.h"
+@implementation Person
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    // 返回能够处理消息的对象
+    if (aSelector == @selector(driving)) {
+        return [[Car alloc] init];
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+@end
+
+--------------
+
+#import<Foundation/Foundation.h>
+#import "Person.h"
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+
+        Person *person = [[Person alloc] init];
+        [person driving];
+    }
+    return 0;
+}
+
+// 打印内容
+// 消息转发[3452:1639178] car driving
+```
+
+上面的代码可以看出，当本类没有实现方法，并且没有进行动态解析方法，就会调用`forwardingTargetForSelector`函数，进行消息转发，我们可以实现`forwardingTargetForSelector`函数，在其内部将消息转发给可以实现此方法的对象。
+
+如果`forwardingTargetForSelector`函数返回的是`nil`或者没有实现的话，就会调用`methodSignatureForSelector`方法，用来返回一个方法签名，这也是我们正确跳转方法的最后机会。
+
+#如果`methodSignatureForSelector`方法返回正确的方法签名就会调用`forwardInvocation`方法，`forwardInvocation`方法内部提供了一个`NSInvocation`类型的参数，`NSInvocation`封装了一个方法的调用，包括方法的调用者，方法名，以及方法的参数。在`forwardInvocation`内部修改方法调用对象即可。
+
+如果`methodSignatureForSelector`返回为nil，就会来到`doseNotReconizeSelector`方法内部，程序会crash。
+
+```php
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    // 返回能够处理消息的对象
+    if (aSelector == @selector(driving)) {
+        // 返回nil则会调用methodSignatureForSelector方法
+        return nil; 
+        // return [[Car alloc] init];
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+
+// 方法签名：返回值类型、参数类型
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+    if (aSelector == @selector(driving)) {
+       // return [NSMethodSignature signatureWithObjCTypes: "v@:"];
+       // return [NSMethodSignature signatureWithObjCTypes: "v16@0:8"];
+       // 也可以通过调用Car的methodSignatureForSelector方法得到方法签名，这种方式需要car对象有aSelector方法
+        return [[[Car alloc] init] methodSignatureForSelector: aSelector];
+
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+//NSInvocation 封装了一个方法调用，包括：方法调用者，方法，方法的参数
+//    anInvocation.target 方法调用者
+//    anInvocation.selector 方法名
+//    [anInvocation getArgument: NULL atIndex: 0]; 获得参数
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+//   anInvocation中封装了methodSignatureForSelector函数中返回的方法。
+//   此时anInvocation.target 还是person对象，我们需要修改target为可以执行方法的方法调用者。
+//   anInvocation.target = [[Car alloc] init];
+//   [anInvocation invoke];
+    [anInvocation invokeWithTarget: [[Car alloc] init]];
+}
+
+// 打印内容
+// 消息转发[5781:2164454] car driving
+```
+
+![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime3-4.png)
 
 ## 1）NSInvocation
 
