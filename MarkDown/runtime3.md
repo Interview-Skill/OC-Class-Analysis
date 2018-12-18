@@ -712,8 +712,155 @@ int main(int argc, const char * argv[]) {
 // 消息转发[5781:2164454] car driving
 ```
 
-![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime3-4.png)
+![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime3.4.png)
 
 ## 1）NSInvocation
 
+`methodSignatureForSelector`方法中返回的方法签名，在`forwardInvocation`中被包装成为`NSInvocation`对象，`NSInvocation`提供了获取和修改方法名、参数、返回值等方法，在`forwardInvocation`中我么可以对方法做最后的修改。
+
+同样的代码，我们为driving方法添加返回值和参数，并在`forwardInvocation`中修改方法的参数及返回值。
+
+```php
+#import "Car.h"
+@implementation Car
+- (int) driving:(int)time
+{
+    NSLog(@"car driving %d",time);
+    return time * 2;
+}
+@end
+
+#import "Person.h"
+#import <objc/runtime.h>
+#import "Car.h"
+
+@implementation Person
+- (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    // 返回能够处理消息的对象
+    if (aSelector == @selector(driving)) {
+        return nil;
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+
+// 方法签名：返回值类型、参数类型
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+    if (aSelector == @selector(driving:)) {
+         // 添加一个int参数及int返回值type为 i@:i
+         return [NSMethodSignature signatureWithObjCTypes: "i@:i"];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+
+//NSInvocation 封装了一个方法调用，包括：方法调用者，方法，方法的参数
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{    
+    int time;
+    // 获取方法的参数，方法默认还有self和cmd两个参数，因此新添加的参数下标为2
+    [anInvocation getArgument: &time atIndex: 2];
+    NSLog(@"修改前参数的值 = %d",time);
+    time = time + 10; // time = 110
+    NSLog(@"修改前参数的值 = %d",time);
+    // 设置方法的参数 此时将参数设置为110
+    [anInvocation setArgument: &time atIndex:2];
+    
+    // 将tagert设置为Car实例对象
+    [anInvocation invokeWithTarget: [[Car alloc] init]];
+    
+    // 获取方法的返回值
+    int result;
+    [anInvocation getReturnValue: &result];
+    NSLog(@"获取方法的返回值 = %d",result); // result = 220,说明参数修改成功
+    
+    result = 99;
+    // 设置方法的返回值 重新将返回值设置为99
+    [anInvocation setReturnValue: &result];
+    
+    // 获取方法的返回值
+    [anInvocation getReturnValue: &result];
+    NSLog(@"修改方法的返回值为 = %d",result);    // result = 99
+}
+
+#import<Foundation/Foundation.h>
+#import "Person.h"
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Person *person = [[Person alloc] init];
+        // 传入100，并打印返回值
+        NSLog(@"[person driving: 100] = %d",[person driving: 100]);
+    }
+    return 0;
+}
+```
+
+```php
+消息转发[6415:2290423] 修改前参数的值 = 100
+消息转发[6415:2290423] 修改前参数的值 = 110
+消息转发[6415:2290423] car driving 110
+消息转发[6415:2290423] 获取方法的返回值 = 220
+消息转发[6415:2290423] 修改方法的返回值为 = 99
+消息转发[6415:2290423] [person driving: 100] = 99
+```
+
+我们可以发现，在设置`Target`为Car的实例对象的时候，就已经对方法进行了调用，而在`forwardInvocation`方法结束后才输出返回值。
+
+因此，只要来到方法`forwardInvocation`方法中，我们便对方法调用有了绝对的掌控权，可以选择是否调用方法，以及修改方法的返回值等。
+
 # 4.类方法的消息转发
+
+类方法消息转发同对象方法一样，同样需要经过消息发送，动态方法解析之后才会进行消息转发机制。我们知道类方法是存储在元类对象中的，元类对象本来也是一种特殊的类对象。需要注意的是，类方法的消息接受者变为类对象。
+
+**当类对象进行消息转发时，对调用相应的+号的`forwardingTargetForSelector、methodSignatureForSelector、forwardInvocation`方法，需要注意的是+号方法仅仅没有提示，而不是系统不会对类方法进行消息转发。**
+
+```php
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        [Person driving];
+    }
+    return 0;
+}
+
+#import "Car.h"
+@implementation Car
++ (void) driving;
+{
+    NSLog(@"car driving");
+}
+@end
+
+#import "Person.h"
+#import <objc/runtime.h>
+#import "Car.h"
+
+@implementation Person
+
++ (id)forwardingTargetForSelector:(SEL)aSelector
+{
+    // 返回能够处理消息的对象
+    if (aSelector == @selector(driving)) {
+        // 这里需要返回类对象
+        return [Car class]; 
+    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+// 如果forwardInvocation函数中返回nil 则执行下列代码
+// 方法签名：返回值类型、参数类型
++ (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+    if (aSelector == @selector(driving)) {
+        return [NSMethodSignature signatureWithObjCTypes: "v@:"];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
++ (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+    [anInvocation invokeWithTarget: [Car class]];
+}
+
+// 打印结果
+// 消息转发[6935:2415131] car driving
+```
