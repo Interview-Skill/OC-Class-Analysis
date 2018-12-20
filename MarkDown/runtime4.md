@@ -228,7 +228,7 @@ Runtime-super[46993:5195901] 1
 
 `第三个为1：`我们发现传入的并不是元类对象，但是返回1，**是由于 基元类对象的superClass指针指向的是基类对象的**
 
-![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-2.png)
+![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-2.png)
 
 那么`Person元类`通过`superclass`指针一直找到基元类，还是不相等，此时再次通过`superclass`指针来到基类，那么此时发现相等就会返回YES了。
 
@@ -278,7 +278,7 @@ Runtime面试题[15842:2579705] test print name is : (null)
 
 首先通过一张图看一下两种调用方法的内存信息。
 
-![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-3.png)
+![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-3.png)
 
 #### 1.objc为什么可以正常调用方法
 
@@ -335,7 +335,7 @@ NSLog(@"%p %p %p", &a,&b,&c);
 
 上面的面试代码中，包含的局部变量由`objc_super2` `cls` `obj` 下面是结构：
 
-![obj](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-4.png)
+![obj](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/ruutime4-4.png)
 
 上面代码我们知道，`person`实例对象调用方法的时候，会取实例变量的前8个字节空间也就是`isa`来找到类对象地址。那么当访问实例变量的时候，就会跳过`isa`的前8个字节前往下面查找实例变量。
 
@@ -366,7 +366,7 @@ NSLog(@"%p %p %p", &a,&b,&c);
 
 下面是示意图：
 
-![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-5.png)
+![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-5.png)
 
 此时我们再访问`_name`成员变量的时候，越过`cls`内存往高处内存地址寻找就会找到`string`,此时拿到的成员变量就是`string`了。
 
@@ -397,7 +397,7 @@ Runtime面试题[16887:2829028] test print name is : (null)
 
 我们发现程序因为坏地址访问而crash，此时局部变量内存结构如下图所示:
 
-![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-6.png)
+![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-6.png)
 
 当需要访问`_name`成员变量的时候，会在`cls`后高地址为查找8位的字节空间，而我们知道`int`占4位字节，那么此时8位的内存空间同时占据`int`数据及`objc_super`结构体内，因此就会造成坏地址访问而crash。
 
@@ -444,7 +444,7 @@ Runtime面试题[16887:2829028] test print name is : (null)
 // Runtime面试题[17272:2914887] test print name is : (null)
 ```
 
-![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-7.png)
+![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-7.png)
 
 首先通过`obj`找到`cls`，`cls`找到类对象进行方法调用，此时在访问`nickName`时，`obj`查找成员变量，首先跳过8个字节的`cls`，之后跳过`name`所占的8个字节空间，最终再取8个字节空间取出其中的值作为成员变量的值，那么此时也就是`self`了。
 
@@ -474,13 +474,13 @@ Runtime面试题[16887:2829028] test print name is : (null)
 }
 ```
 
-![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-8.png)
+![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-8.png)
 
 通过上面对面试题的分析，我们现在想要验证`objc_msgSendSuper2`函数内传入的结构体参数，只需要拿到`cls`的地址，然后向后移8个地址就可以获取到`objc_super`结构体内的`self`，在向后移8个地址就是`current_class`的内存地址。通过打印`current_class`的内容，就可以知道传入`objc_msgSendSuper2`函数内部的是当前类对象还是父类对象了。
 
 我们来证明他是`UIViewController`还是`ViewController`即可
 
-![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rumtime4-8.png)
+![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/runtime4-8.png)
 
 通过上图可以发现，最终打印的内容确实为当前类对象。  
 **因此`objc_msgSendSuper2`函数内部其实传入的是当前类对象，并且在函数内部获取其父类，告知系统从父类方法开始查找的。**
