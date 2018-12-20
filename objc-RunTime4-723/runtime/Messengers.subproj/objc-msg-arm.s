@@ -412,48 +412,7 @@ LExit$0:
 	END_ENTRY _cache_getImp
 
 
-/********************************************************************
- *
- * id objc_msgSend(id self, SEL _cmd, ...);
- * IMP objc_msgLookup(id self, SEL _cmd, ...);
- * 
- * objc_msgLookup ABI:
- * IMP returned in r12
- * Forwarding returned in Z flag
- * r9 reserved for our use but not used
- *
- ********************************************************************/
-
-	ENTRY _objc_msgSend
-	MESSENGER_START
-	
-	cbz	r0, LNilReceiver_f
-
-	ldr	r9, [r0]		// r9 = self->isa
-	GetClassFromIsa			// r9 = class
-	CacheLookup NORMAL
-	// cache hit, IMP in r12, eq already set for nonstret forwarding
-	MESSENGER_END_FAST
-	bx	r12			// call imp
-
-	CacheLookup2 NORMAL
-	// cache miss
-	ldr	r9, [r0]		// r9 = self->isa
-	GetClassFromIsa			// r9 = class
-	MESSENGER_END_SLOW
-	b	__objc_msgSend_uncached
-
-LNilReceiver:
-	// r0 is already zero
-	mov	r1, #0
-	mov	r2, #0
-	mov	r3, #0
-	FP_RETURN_ZERO
-	MESSENGER_END_NIL
-	bx	lr	
-
-	END_ENTRY _objc_msgSend
-
+i
 	
 	ENTRY _objc_msgLookup
 

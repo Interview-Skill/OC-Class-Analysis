@@ -165,11 +165,64 @@ struct objc_super2 {
 
 ## 2. isKindOfClass 和 isMemberOfClass
 
+首先来看下`isKindOfClass`和`isMemberOfClass`的对象方法底层实现：
 
+```php
+- (BOOL)isMemberOfClass:(Class)cls {
+   // 直接获取实例类对象并判断是否等于传入的类对象
+    return [self class] == cls;
+}
 
+- (BOOL)isKindOfClass:(Class)cls {
+   // 向上查询，如果找到父类对象等于传入的类对象则返回YES
+   // 直到基类还不相等则返回NO
+    for (Class tcls = [self class]; tcls; tcls = tcls->superclass) {
+        if (tcls == cls) return YES;
+    }
+    return NO;
+}
+```
 
+`isKindOfClass`和`isMemberOfClass`的类方法实现：
 
+```php
+// 判断元类对象是否等于传入的元类元类对象
+// 此时self是类对象 object_getClass((id)self)就是元类
++ (BOOL)isMemberOfClass:(Class)cls {
+    return object_getClass((id)self) == cls;
+}
 
+// 向上查找，判断元类对象是否等于传入的元类对象
+// 如果找到基类还不相等则返回NO
+// 注意：这里会找到基类
++ (BOOL)isKindOfClass:(Class)cls {
+    for (Class tcls = object_getClass((id)self); tcls; tcls = tcls->superclass) {
+        if (tcls == cls) return YES;
+    }
+    return NO;
+}
+```
+
+`isMemberOfClass`**直接判断左边的类对象是不是等于右边的类对象**
+
+`isKindOfClass`**判断左边或者左边的父类对象是否刚好等于右边类型**
+
+⚠️**类方法内部是获取其元类对象进行对比**
+
+下面练习：
+
+```php
+NSLog(@"%d",[Person isKindOfClass: [Person class]]);
+NSLog(@"%d",[Person isKindOfClass: object_getClass([Person class])]);
+NSLog(@"%d",[Person isKindOfClass: [NSObject class]]);
+
+// 输出内容
+Runtime-super[46993:5195901] 0
+Runtime-super[46993:5195901] 1
+Runtime-super[46993:5195901] 1
+```
+
+`第一个为0：`上面知道类方法里面是获取self的元类对象和传入的参数进行的比较，但是第一个我们传入的是类对象，因此是0.
 
 
 
