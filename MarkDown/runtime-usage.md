@@ -151,35 +151,240 @@ class_getInstanceMethod(<#__unsafe_unretained Class cls#>, <#SEL name#>)
 
 ## 4、动态添加方法
 
+**如果一个类的方法非常多，其中有些方法暂时用不到。而加载类方法到内存中需要给每个方法生成映射表，但是又比较耗费资源，此时可以使用runtime动态添加方法**
+
+动态给某个类添加方法，相当于懒加载机制，类中有许多用不到的类，可以先不加载，等用到的时候再加载。
+
+动态添加方法：
+
+首先我们不实现对象方法，当调用`performSelector`的时候再动态的加载方法。
+
+```php
+Person *p = [[Person alloc]init];
+// 当调用 P中没有实现的方法时，动态加载方法
+[p performSelector:@selector(eat)];
+```
+
+这个时候编译是不会报错的，程序运行时才会报错，因为person并没有实现`eat`方法。
+
+而当找不到对应的方法时就会来到拦截调用，在找不到调用的方法程序崩溃之前调用的方法。  
+当调用了没有实现的对象方法的时，就会调用**`+(BOOL)resolveInstanceMethod:(SEL)sel`**方法。  
+当调用了没有实现的类方法的时候，就会调用**`+(BOOL)resolveClassMethod:(SEL)sel`**方法。
+
+首先我们来到API中看一下苹果的说明，搜索 Dynamic Method Resolution 来到动态方法解析。
+
+![a](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rs-3.png)
+
+**Dynamic Method Resolution的API中已经讲解的很清晰，我们可以实现方法`resolveInstanceMethod:`或者`resolveClassMethod:`方法，动态的给实例方法或者类方法添加方法和方法实现。**
+
+所以通过这两个方法就可以知道哪些方法没有实现，从而动态添加方法。参数sel即表示没有实现的方法。
+
+**一个objective - C方法最终都是一个C函数，默认任何一个方法都有两个参数。**  
+self : 方法调用者 _cmd : 调用方法编号。我们可以使用函数class_addMethod为类添加一个方法以及实现。**
+
+这里仿照API给的例子，动态的为P实例添加eat对象
+
+```php
++(BOOL)resolveInstanceMethod:(SEL)sel
+{
+    // 动态添加eat方法
+    // 首先判断sel是不是eat方法 也可以转化成字符串进行比较。    
+    if (sel == @selector(eat)) {
+    /** 
+     第一个参数： cls:给哪个类添加方法
+     第二个参数： SEL name:添加方法的编号
+     第三个参数： IMP imp: 方法的实现，函数入口，函数名可与方法名不同（建议与方法名相同）
+     第四个参数： types :方法类型，需要用特定符号，参考API
+     */
+      class_addMethod(self, sel, (IMP)eat , "v@:");
+        // 处理完返回YES
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+```
+
+**动态添加有参数的方法**  
+如果是有参数的方法，需要对方法的实现和class_addMethod方法内方法类型参数做一些修改。  
+方法实现：因为在C语言函数中，所以对象参数类型只能用id代替。  
+方法类型参数：因为添加了一个id参数，所以方法类型应该为**`"v@:@"`**  
+来看一下代码:
+
+```php
++(BOOL)resolveInstanceMethod:(SEL)sel
+{
+    if (sel == @selector(eat:)) {
+        class_addMethod(self, sel, (IMP)aaaa , "v@:@");
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+void aaaa(id self ,SEL _cmd,id Num)
+{
+    // 实现内容
+    NSLog(@"%@的%@方法动态实现了,参数为%@",self,NSStringFromSelector(_cmd),Num);
+}
+```
+
+## 5.Runtime动态添加属性
+
+首先看下对象和属性的关系：
+
+![image](https://github.com/Interview-Skill/OC-Class-Analysis/blob/master/Image/rs-4.png)
+
+对象一开始初始化的时候其属性`name`为nil，给属性赋值就是让`name`属性指向一块存储字符串的内存，使得这个对象的属性和这块内存产生关联。
+
+那么如果想动态添加属性，其实就是动态的产生某种关联，而想要给系统动态的添加属性，只能通过分类：
+
+#### 1.通过使用静态全局变量给分类添加属性
+
+```php
+static NSString *_name;
+-(void)setName:(NSString *)name
+{
+    _name = name;
+}
+-(NSString *)name
+{
+    return _name;
+}
+```
+
+但是这样的话`name`只要程序运行，就会一直存在内存中。
+
+#### 2.使用Runtime
+
+```php
+-(void)setName:(NSString *)name
+{
+    objc_setAssociatedObject(self, @"name",name, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+-(NSString *)name
+{
+    return objc_getAssociatedObject(self, @"name");    
+}
+```
+
+1. 动态添加属性
+
+```php
+objc_setAssociatedObject(id object, const void *key, id value, objc_AssociationPolicy policy);
+```
+
+参数一：**`id object`**: 给哪个对象添加属性，这里要给自己添加属性，用self。  
+参数二：**`void * == id key`**: 属性名，根据key获取关联对象的属性的值，在**`objc_getAssociatedObject`**中通过次key获得属性的值并返回。  
+参数三：**`id value`**: 关联的值，也就是set方法传入的值给属性去保存。  
+参数四：**`objc_AssociationPolicy policy`**: 策略，属性以什么形式保存。  
+有以下几种:
+
+```php
+typedef OBJC_ENUM(uintptr_t, objc_AssociationPolicy) {
+    OBJC_ASSOCIATION_ASSIGN = 0,  // 指定一个弱引用相关联的对象
+    OBJC_ASSOCIATION_RETAIN_NONATOMIC = 1, // 指定相关对象的强引用，非原子性
+    OBJC_ASSOCIATION_COPY_NONATOMIC = 3,  // 指定相关的对象被复制，非原子性
+    OBJC_ASSOCIATION_RETAIN = 01401,  // 指定相关对象的强引用，原子性
+    OBJC_ASSOCIATION_COPY = 01403     // 指定相关的对象被复制，原子性   
+};
+```
+
+2. 获得属性
+
+```php
+objc_getAssociatedObject(id object, const void *key);
+```
+
+参数一：**`id object`**: 获取哪个对象里面的关联的属性。  
+参数二：**`void * == id key`**: 什么属性，与**`objc_setAssociatedObject`**中的key相对应，即通过key值取出value。
+
+此时已经成功给NSObject添加name属性，并且NSObject对象可以通过点语法为属性赋值。
+
+```php
+NSObject *objc = [[NSObject alloc]init];
+objc.name = @"xx_cc";
+NSLog(@"%@",objc.name);
+```
+
+## 6.RunTime字典转模型
+
+通过给`NSObject`添加分类，声明并实现使用`Runtime`字典转模型的类方法：
+
+```php
++ (instancetype)modelWithDict:(NSDictionary *)dict
+```
+
+首先看看使用KVC进行转化和runtime有什么区别
+
+> **KVC** :kvc字典转模型实现原理就是遍历字典中的所有的key，然后去模型中找到对应的属性名，要求属性名和key必须一一对应，字典中所有的key必须在模型中存在。
+> 
+> **Runtime**: Runtime字典转模型就是遍历模型中所有的属性名，然后去字典中找到对应的key，也就是以模型为准，模型中有的，就去字典中查找。
 
 
 
+Runtime转字典的好处就是：当服务器返回很多数据的时候，而我们只需要其中一部分，没有用的属性就没有必要进行转化。
 
+### Runtime字典转模型过程
 
+属性定义在类里面，那么类就有一个属性列表，属性列表以数组的形式存在，根据属性列表就可以获得类里面的所有属性，所以遍历属性列表，也可以遍历模型中所有的属性名：
 
+1.创建模型对象：
 
+```php
+id objc = [[self alloc] init];
+```
 
+2.使用`class_copyIvarList`拷贝成员变量列表
 
+```php
+unsigned int count = 0;
+Ivar *ivarList = class_copyIvarList(self, &count);
+```
 
+参数一：**`__unsafe_unretained Class cls`**: 获取哪个类的成员属性列表。这里是self，因为谁调用分类中类方法，谁就是self。  
+参数二：**`unsigned int *outCount`**: 无符号int型指针，这里创建unsigned int型count，&count就是他的地址，保证在方法中可以拿到count的地址为count赋值。传出来的值为成员属性总数。  
+返回值：**`Ivar *`**: 返回的是一个Ivar类型的指针 。指针默认指向的是数组的第0个元素，指针+1会向高地址移动一个Ivar单位的字节，也就是指向第一个元素。Ivar表示成员属性。
 
+3.遍历成员变量，获取属性列表：
 
+```php
+for (int i = 0 ; i < count; i++) {
+        // 获取成员属性
+        Ivar ivar = ivarList[i];
+}
+```
 
+4.使用`ivar_getName(ivar)`获取属性名，因为成员变量属性名返回的是C语言字符串
 
+```php
+NSString *propertyName = [NSString stringWithUTF8String:ivar_getName(ivar)]
+```
 
+5.因为获得的成员属性名，是带有_的成员属性，所以需要将下划线去掉，
 
+```php
+// 获取key
+NSString *key = [propertyName substringFromIndex:1];
+```
 
+6.获取字典中key对于的value
 
+```php
+// 获取字典的value
+id value = dict[key];
+```
 
+7.给模型赋值，并返回模型
 
+```php
+if (value) {
+ // KVC赋值:不能传空
+[objc setValue:value forKey:key];
+}
+return objc;
+```
 
+## 7.runtime转换模型二级转换
 
-
-
-
-
-
-
-
+在
 
 
 
