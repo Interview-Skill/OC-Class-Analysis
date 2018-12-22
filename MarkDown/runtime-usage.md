@@ -384,17 +384,100 @@ return objc;
 
 ## 7.runtime转换模型二级转换
 
-在
+在开发中经常遇到模型中嵌套一个模型。
 
+##### 1.首先获得一级模型中成员属性类型：
 
+```php
+// 成员属性类型
+NSString *propertyType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
+```
 
+##### 2.判断当一级字典中value的值为字典，并且一级模型中的成员属性类型不是`NSDictionary`才需要进行转化
 
+首先value是dic才需要转换为模型，因为这个是我们的需求，另外成员变量不是系统类，说明成员变量是我们自定义的类，如果成员变量是Dic，说明我们本来就是想属性是一个字典，因此不要转换。
 
+```php
+id value = dict[key];
+if ([value isKindOfClass:[NSDictionary class]] && ![propertyType containsString:@"NS"]) 
+{ 
+      // 进行二级转换。
+}
+```
 
+##### 3.获取需要转换的模型类型，这里需要对propertyType成员变量做处理，因为propertyType返回给我们的是成员`@\"mode"`，因此我们需要处理成mode
 
+```php
+// @\"Mode\"去掉前面的@\"
+NSRange range = [propertyType rangeOfString:@"\""];
+propertyType = [propertyType substringFromIndex:range.location + range.length];
+// Mode\"去掉后面的\"
+range = [propertyType rangeOfString:@"\""];
+propertyType = [propertyType substringToIndex:range.location];
 
+```
 
+##### 4.获取需要转换的类对象，将字符串转化为类名
 
+```php
+Class modelClass =  NSClassFromString(propertyType);
+```
+
+##### 5.判断如果类名不为则调用`modelWithDic`进行二级转化，返回二级模型给value
+
+```php
+if (modelClass) {
+      value =  [modelClass modelWithDict:value];
+}  
+```
+
+完整的：
+
+```php
++ (instancetype)modelWithDict:(NSDictionary *)dict{
+    // 1.创建对应类的对象
+    id objc = [[self alloc] init];
+    // count:成员属性总数
+    unsigned int count = 0;
+   // 获得成员属性列表和成员属性数量
+    Ivar *ivarList = class_copyIvarList(self, &count);
+    for (int i = 0 ; i < count; i++) {
+        // 获取成员属性
+        Ivar ivar = ivarList[i];
+        // 获取成员名
+       NSString *propertyName = [NSString stringWithUTF8String:ivar_getName(ivar)];
+        // 获取key
+        NSString *key = [propertyName substringFromIndex:1];
+        // 获取字典的value key:属性名 value:字典的值
+        id value = dict[key];
+        // 获取成员属性类型
+        NSString *propertyType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)];
+        // 二级转换
+        // value值是字典并且成员属性的类型不是字典,才需要转换成模型
+        if ([value isKindOfClass:[NSDictionary class]] && ![propertyType containsString:@"NS"]) {
+            // 进行二级转换
+            // 获取二级模型类型进行字符串截取，转换为类名
+            NSRange range = [propertyType rangeOfString:@"\""];
+            propertyType = [propertyType substringFromIndex:range.location + range.length];
+            range = [propertyType rangeOfString:@"\""];
+            propertyType = [propertyType substringToIndex:range.location];
+            // 获取需要转换类的类对象
+           Class modelClass =  NSClassFromString(propertyType);
+           // 如果类名不为空则进行二级转换
+            if (modelClass) {
+                // 返回二级模型赋值给value
+                value =  [modelClass modelWithDict:value];
+            }
+        }
+        if (value) {
+            // KVC赋值:不能传空
+            [objc setValue:value forKey:key];
+        }
+    }
+    // 返回模型
+    return objc;
+}
+```
 
 
 
